@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1>Welcome to Sarawak</h1>
+<p class="lead">Plan your trip, book a stay and manage tourism listings in one place.</p>
+<div class="cards">
+  {% for endpoint, name, blurb in areas %}
+    <a class="card" href="{{ url_for(endpoint) }}">
+      <h2>{{ name }}</h2>
+      <p>{{ blurb }}</p>
+    </a>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<h1>Sign in</h1>
+<form method="post" class="form" novalidate>
+  {% if error %}<div class="flash error" role="alert">{{ error }}</div>{% endif %}
+  <label for="email">Email</label>
+  <input id="email" name="email" type="email" value="{{ email }}" autocomplete="username">
+  <label for="password">Password</label>
+  <input id="password" name="password" type="password" autocomplete="current-password">
+  <button type="submit">Sign in</button>
+  <p class="hint">No account? <a href="{{ url_for('auth.register') }}">Register</a></p>
+</form>
+{% endblock %}
