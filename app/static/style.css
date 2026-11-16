@@ -74,9 +74,15 @@ main {
     margin: 0;
     padding-bottom: 30vh;
     display: flex;
+    flex-direction: column;
     flex: 1;
     align-items: center;
     justify-content: center;
+}
+
+.auth-main > .flash {
+    width: 100%;
+    max-width: 440px;
 }
 
 .auth-content {
