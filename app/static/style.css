@@ -29,8 +29,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    padding: .8rem 1.5rem;
+    flex-wrap: wrap;
+    gap: .8rem;
+    padding: .8rem 1.8rem;
     background: var(--brand);
     color: #fff;
 }
@@ -38,12 +39,43 @@ body {
 .topbar a, .topbar .link {
     color: #fff;
     text-decoration: none;
-    margin-left: 1rem;
 }
 
 .brand {
     font-weight: 700;
-    margin-left: 0 !important;
+    font-size: 1.2rem;
+}
+
+.topbar nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .8rem;
+}
+
+.topbar nav a, .topbar nav .link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .36rem .8rem;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.topbar nav .sign-in {
+    background: #fff;
+    color: var(--brand);
+}
+
+.topbar nav .register {
+    border-color: #fff;
+}
+
+.topbar nav .sign-out {
+    background: var(--error);
+    color: #fff;
 }
 
 .who {
