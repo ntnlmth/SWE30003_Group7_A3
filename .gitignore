@@ -1,7 +1,324 @@
+
+# ============================================================
+# SWE30003 Group 7 - Assignment 3
+# Python Flask / SQLite Project
+# ============================================================
+
+
+# ============================================================
+# 1. Python Bytecode and Cache
+# ============================================================
+
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.pycache/
+
+
+# ============================================================
+# 2. Python Virtual Environments
+# ============================================================
+
 venv/
+.venv/
 env/
-instance/
-*.db
+.env/
+ENV/
+venv.bak/
+.venv.bak/
+virtualenv/
+.python-version
+
+
+# ============================================================
+# 3. Python Build and Distribution Files
+# ============================================================
+
+build/
+dist/
+downloads/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+pip-wheel-metadata/
+MANIFEST
+
+
+# ============================================================
+# 4. Python Testing and Coverage
+# ============================================================
+
 .pytest_cache/
+.tox/
+.nox/
+.hypothesis/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+test-results/
+junit.xml
+*.cover
+*.py,cover
+
+
+# ============================================================
+# 5. Python Linters and Type Checkers
+# ============================================================
+
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+.dmypy.json
+.dmypy.json.*
+.pyre_configuration.local
+
+
+# ============================================================
+# 6. Jupyter Notebook Checkpoints
+# ============================================================
+
+.ipynb_checkpoints/
+.profile_default/
+
+
+# ============================================================
+# 7. Visual Studio Code
+# ============================================================
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+*.code-workspace
+.history/
+.local-history/
+
+
+# ============================================================
+# 8. Visual Studio 2022 / 2026
+# ============================================================
+
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.VC.opendb
+*.VC.db-shm
+*.VC.db-wal
+ipch/
+Debug/
+Release/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+*.tlog
+*.lastbuildstate
+*.ilk
+*.pdb
+*.idb
+*.ipch
+*.opendb
+*.sdf
+*.opensdf
+
+
+# ============================================================
+# 9. JetBrains IDEs
+# IntelliJ IDEA / PyCharm / WebStorm / Rider
+# ============================================================
+
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+cmake-build-*/
+.idea_modules/
+
+
+# ============================================================
+# 10. Operating System Files
+# Windows / macOS / Linux
+# ============================================================
+
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Trashes/
+.Spotlight-V100/
+.fseventsd/
+*~
+
+
+# ============================================================
+# 11. Microsoft Word / Excel / PowerPoint
+# Temporary and Auto-Recovery Files
+# ============================================================
+
+~$*
+*.asd
+*.wbk
+*.tmp
+*.temp
+*.xlk
+*.xar
+*.pptx.tmp
+*.docx.tmp
+*.xlsx.tmp
+
+# Uncomment to exclude all Office documents.
+# Warning: Assignment reports may need version control.
+# *.doc
+# *.docx
+# *.xls
+# *.xlsx
+# *.ppt
+# *.pptx
+# *.xlsm
+# *.pptm
+
+
+# ============================================================
+# 12. PDF and Document Temporary Files
+# ============================================================
+
+*.pdf.tmp
+*.bak
+*.backup
+*.swp
+*.swo
+*.orig
+*.rej
+
+
+# ============================================================
+# 13. Flask Runtime Files
+# ============================================================
+
+instance/
+.webassets-cache/
+flask_session/
+sessions/
+
+
+# ============================================================
+# 14. SQLite Databases and Runtime Files
+# ============================================================
+
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+
+# Keep database schema and seed scripts tracked.
+# app/data/schema.sql
+# app/data/seed.py
+
+
+# ============================================================
+# 15. Environment Variables and Secrets
+# ============================================================
+
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.secret
+secrets.json
+credentials.json
+service-account.json
+
+
+# ============================================================
+# 16. Logs and Runtime Output
+# ============================================================
+
+*.log
+logs/
+log/
+*.pid
+*.pid.lock
+*.stackdump
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+# ============================================================
+# 17. Temporary Files and Local Backups
+# ============================================================
+
+tmp/
+temp/
+.cache/
+.cache-loader/
+*.cache
+*.old
+*.save
+*.swn
+
+
+# ============================================================
+# 18. Local Package Manager Files
+# ============================================================
+
+pip-log.txt
+pip-delete-this-directory.txt
+.pip-cache/
+.pdm-python
+.pdm-build/
+__pypackages__/
+.uv-cache/
+
+
+# ============================================================
+# 19. Local Development and Tooling
+# ============================================================
+
+.direnv/
+.envrc.local
+.vagrant/
+terraform.tfstate
+terraform.tfstate.*
+.terraform/
+
+
+# ============================================================
+# 20. Project-Specific Generated Files
+# ============================================================
+
+# Local application database and generated runtime state.
+instance/stis.db
+
+# Generated reports and test artifacts.
+artifacts/
+test-output/
+coverage-reports/
