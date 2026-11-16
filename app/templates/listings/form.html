@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='listings.css') }}">
+<h1>{{ heading }}: {{ kind.TYPE_LABEL|lower }}</h1>
+
+{% if errors %}
+<div class="flash error" role="alert">Some details need fixing. Check the fields marked below; what you typed has been kept.</div>
+{% endif %}
+
+{% if duplicate %}
+<div class="warn" role="alert">
+  <strong>This looks like a listing that already exists:</strong>
+  {{ duplicate.name }}, {{ duplicate.location }} ({{ duplicate.status_label }}).
+  Change the name or location, or use “{{ 'Save anyway' if mode == 'edit' else 'Add anyway' }}” if it really is a different listing.
+</div>
+{% endif %}
+
+<form method="post" class="form wide" novalidate>
+  <label for="name">Name</label>
+  <input id="name" name="name" value="{{ form.name }}" maxlength="100">
+  {% if errors.name %}<p class="field-error">{{ errors.name }}</p>{% endif %}
+
+  <label for="location">Location</label>
+  <input id="location" name="location" value="{{ form.location }}" maxlength="100">
+  {% if errors.location %}<p class="field-error">{{ errors.location }}</p>{% endif %}
+
+  <label for="description">Description (optional)</label>
+  <textarea id="description" name="description" maxlength="1000">{{ form.description }}</textarea>
+  {% if errors.description %}<p class="field-error">{{ errors.description }}</p>{% endif %}
+
+  <label for="price">{{ kind.PRICE_LABEL }}</label>
+  <input id="price" name="price" value="{{ form.price }}" inputmode="decimal">
+  {% if errors.price %}<p class="field-error">{{ errors.price }}</p>{% endif %}
+
+  <label for="contact_phone">Phone number</label>
+  <input id="contact_phone" name="contact_phone" value="{{ form.contact_phone }}" placeholder="082-123456">
+  {% if errors.contact_phone %}<p class="field-error">{{ errors.contact_phone }}</p>{% endif %}
+
+  {% if kind.HAS_OPENING_HOURS %}
+    <label for="opening_time">Opening time (HH:MM)</label>
+    <input id="opening_time" name="opening_time" value="{{ form.opening_time }}" placeholder="09:00">
+    {% if errors.opening_time %}<p class="field-error">{{ errors.opening_time }}</p>{% endif %}
+
+    <label for="closing_time">Closing time (HH:MM)</label>
+    <input id="closing_time" name="closing_time" value="{{ form.closing_time }}" placeholder="17:00">
+    {% if errors.closing_time %}<p class="field-error">{{ errors.closing_time }}</p>{% endif %}
+  {% endif %}
+
+  {% if kind.HAS_ROOMS %}
+    <label for="room_count">Number of rooms</label>
+    <input id="room_count" name="room_count" value="{{ form.room_count }}" inputmode="numeric">
+    {% if errors.room_count %}<p class="field-error">{{ errors.room_count }}</p>{% endif %}
+  {% endif %}
+
+  <div class="buttons">
+    <button type="submit" class="btn">{{ 'Save changes' if mode == 'edit' else 'Add listing' }}</button>
+    {% if duplicate %}
+      <button type="submit" name="confirm_duplicate" value="1" class="btn secondary">{{ 'Save anyway' if mode == 'edit' else 'Add anyway' }}</button>
+    {% endif %}
+    <a class="cancel" href="{{ url_for('listings.index') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

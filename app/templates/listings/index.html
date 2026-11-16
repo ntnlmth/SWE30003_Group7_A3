@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Manage listings{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='listings.css') }}">
+<h1>Manage listings</h1>
+
+<div class="add-row">
+  <strong>Add a listing:</strong>
+  {% for value, label in add_types %}
+    <a class="btn secondary small" href="{{ url_for('listings.new', listing_type=value) }}">+ {{ label }}</a>
+  {% endfor %}
+</div>
+
+<form method="get" class="toolbar">
+  <label>Search
+    <input name="q" value="{{ filters.search }}" placeholder="Name or location">
+  </label>
+  <label>Type
+    <select name="type">
+      <option value="">All types</option>
+      {% for value, label in filter_types %}
+        <option value="{{ value }}" {% if filters.listing_type == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Status
+    <select name="status">
+      <option value="">Any status</option>
+      <option value="active" {% if filters.status == 'active' %}selected{% endif %}>Active</option>
+      <option value="deactivated" {% if filters.status == 'deactivated' %}selected{% endif %}>Deactivated</option>
+    </select>
+  </label>
+  <button type="submit" class="btn small">Filter</button>
+  <a class="btn secondary small" href="{{ url_for('listings.index') }}">Clear</a>
+</form>
+
+{% if listings %}
+<table class="table">
+  <thead>
+    <tr><th>Name</th><th>Type</th><th>Location</th><th>Price (RM)</th><th>Status</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+  {% for item in listings %}
+    <tr>
+      <td>{{ item.name }}</td>
+      <td>{{ item.type_label }}</td>
+      <td>{{ item.location }}</td>
+      <td>{{ '%.2f'|format(item.price) }}</td>
+      <td><span class="badge {{ 'active' if item.is_active else 'off' }}">{{ item.status_label }}</span></td>
+      <td class="actions">
+        <a class="btn secondary small" href="{{ url_for('listings.edit', listing_id=item.listing_id) }}">Edit</a>
+        {% if item.is_active %}
+          <a class="btn danger small" href="{{ url_for('listings.remove', listing_id=item.listing_id) }}">Remove</a>
+        {% else %}
+          <form method="post" action="{{ url_for('listings.reactivate', listing_id=item.listing_id) }}">
+            <button type="submit" class="btn small">Reactivate</button>
+          </form>
+          <a class="btn danger small" href="{{ url_for('listings.remove', listing_id=item.listing_id) }}">Remove</a>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No listings match. Use the buttons above to add one, or clear the filters.</p>
+{% endif %}
+{% endblock %}

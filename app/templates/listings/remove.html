@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Remove {{ listing.name }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='listings.css') }}">
+<h1>Remove “{{ listing.name }}”?</h1>
+
+{% if references.has_records %}
+  <div class="warn" role="alert">
+    <strong>This listing cannot be deleted.</strong>
+    Bookings or itineraries still refer to it. It will be <strong>deactivated</strong>:
+    hidden from tourists, with its record kept so nothing breaks.
+  </div>
+{% else %}
+  <div class="warn" role="alert">
+    Nothing refers to this listing, so it will be <strong>permanently deleted</strong>.
+  </div>
+{% endif %}
+
+{% if references.upcoming_bookings %}
+<div class="panel">
+  <strong>Upcoming bookings affected ({{ references.upcoming_bookings|length }})</strong>
+  <ul>
+    {% for booking in references.upcoming_bookings %}
+      <li>{{ booking.tourist_name }}: {{ booking.check_in }} to {{ booking.check_out }} ({{ booking.status }})</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if references.upcoming_items %}
+<div class="panel">
+  <strong>Itinerary items affected ({{ references.upcoming_items|length }})</strong>
+  <ul>
+    {% for item in references.upcoming_items %}
+      <li>{{ item.tourist_name }}: “{{ item.itinerary_title }}” on {{ item.day }}, {{ item.start_time }} to {{ item.end_time }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<form method="post">
+  <button type="submit" class="btn danger">{{ 'Deactivate listing' if references.has_records else 'Delete listing' }}</button>
+  <a class="cancel" href="{{ url_for('listings.index') }}">Cancel</a>
+</form>
+{% endblock %}
