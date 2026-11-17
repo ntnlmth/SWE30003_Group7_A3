@@ -318,6 +318,14 @@ terraform.tfstate.*
 # Local application database and generated runtime state.
 instance/stis.db
 
+# Local AI assistant configuration and project memories.
+/.codex/
+/.claude/
+/.agents/
+/AGENTS.md
+/CLAUDE.md
+/memories/
+
 # Generated reports and test artifacts.
 artifacts/
 test-output/
