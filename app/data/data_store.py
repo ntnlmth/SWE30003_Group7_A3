@@ -7,7 +7,7 @@ objects through it instead of opening the database itself.
 
 import os
 import sqlite3
-from contextlib import closing
+from contextlib import closing, contextmanager
 
 SCHEMA_FILE = os.path.join(os.path.dirname(__file__), "schema.sql")
 
@@ -47,6 +47,18 @@ class DataStore:
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA foreign_keys = ON")
         return connection
+
+    @contextmanager
+    def transaction(self):
+        """Yield a connection; commit on success and roll back on error.
+
+        Run all SQL in the block through the yielded connection.
+        The connection is closed when the block exits.
+        """
+        with closing(self._connect()) as connection:
+            with connection:
+                connection.execute("BEGIN")
+                yield connection
 
     def create_schema(self):
         """Create any tables that do not exist yet."""

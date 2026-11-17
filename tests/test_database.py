@@ -105,3 +105,35 @@ def test_booking_with_payment_cannot_be_deleted(store):
     with pytest.raises(sqlite3.IntegrityError):
         store.execute("DELETE FROM bookings WHERE id = ?",
                       (payment["booking_id"],))
+
+
+def test_transaction_commits_and_closes(store):
+    with store.transaction() as connection:
+        connection.execute("UPDATE bookings SET guests = 3 WHERE id = 1")
+        connection.execute("UPDATE bookings SET guests = 4 WHERE id = 2")
+        assert connection.execute(
+            "SELECT guests FROM bookings WHERE id = 1").fetchone()[0] == 3
+        assert store.find_one(
+            "SELECT guests FROM bookings WHERE id = 1")["guests"] != 3
+    assert store.find_one(
+        "SELECT guests FROM bookings WHERE id = 1")["guests"] == 3
+    assert store.find_one(
+        "SELECT guests FROM bookings WHERE id = 2")["guests"] == 4
+    with pytest.raises(sqlite3.ProgrammingError):
+        connection.execute("SELECT 1")
+
+
+@pytest.mark.parametrize("sql_error", [True, False])
+def test_transaction_rolls_back_and_closes(store, sql_error):
+    before = store.find_all("SELECT * FROM bookings ORDER BY id")
+    error = sqlite3.IntegrityError if sql_error else ValueError
+    with pytest.raises(error):
+        with store.transaction() as connection:
+            connection.execute("UPDATE bookings SET guests = 3 WHERE id = 1")
+            if sql_error:
+                connection.execute("UPDATE bookings SET tourist_id = -1")
+            else:
+                raise ValueError("Cancel operation")
+    assert store.find_all("SELECT * FROM bookings ORDER BY id") == before
+    with pytest.raises(sqlite3.ProgrammingError):
+        connection.execute("SELECT 1")
