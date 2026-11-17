@@ -152,6 +152,17 @@ def test_booking_payment_constraints(store, sql):
         store.execute(sql)
 
 
+@pytest.mark.parametrize("table", ["bookings", "payments"])
+def test_status_columns_remain_not_null(store, table):
+    columns = {
+        column["name"]: column
+        for column in store.find_all(f"PRAGMA table_info({table})")
+    }
+    assert columns["status"]["notnull"] == 1
+    with pytest.raises(sqlite3.IntegrityError):
+        store.execute(f"UPDATE {table} SET status = NULL")
+
+
 def test_constraint_boundaries(store):
     for status in ('pending', 'confirmed', 'cancelled'):
         store.execute("UPDATE bookings SET status = ?", (status,))
@@ -257,3 +268,35 @@ def test_seed_fills_missing_users_and_listings(tmp_path, partial_samples):
     before = {t: store.find_all(f"SELECT * FROM {t}") for t in tables}
     seed_sample_data(store)
     assert before == {t: store.find_all(f"SELECT * FROM {t}") for t in tables}
+
+
+@pytest.mark.parametrize(
+    'failure_table', ['users', 'listings', 'activity_log'])
+def test_seed_failure_rolls_back_entire_dataset(tmp_path, failure_table):
+    store = DataStore(str(tmp_path / 'atomic-seed.db'))
+    store.create_schema()
+    store.execute(
+        "INSERT INTO users (role, name, email, password_hash) "
+        "VALUES ('operator', 'Existing', 'operator@example.com', 'hash')")
+    tables = ('users', 'listings', 'bookings', 'payments', 'itineraries',
+              'itinerary_items', 'activity_log', 'notifications')
+    before = {t: store.find_all(f'SELECT * FROM {t}') for t in tables}
+    condition = {
+        'users': "NEW.email = 'admin@example.com'",
+        'listings': "NEW.name = 'Damai Beach Resort'",
+        'activity_log': "NEW.action = 'demo_dataset_v1'",
+    }[failure_table]
+    store.execute(f'''
+        CREATE TRIGGER fail_seed BEFORE INSERT ON {failure_table}
+        WHEN {condition}
+        BEGIN SELECT RAISE(ABORT, 'Injected seed failure'); END
+    ''')
+    with pytest.raises(sqlite3.IntegrityError, match='Injected seed failure'):
+        seed_sample_data(store)
+    assert before == {t: store.find_all(f'SELECT * FROM {t}') for t in tables}
+    store.execute('DROP TRIGGER fail_seed')
+    seed_sample_data(store)
+    assert len(store.find_all('SELECT * FROM users')) == 4
+    assert len(store.find_all('SELECT * FROM listings')) == 5
+    assert len(store.find_all('SELECT * FROM bookings')) == 4
+    assert store.find_all('PRAGMA foreign_key_check') == []
