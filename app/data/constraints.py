@@ -20,19 +20,21 @@ def install_constraints(connection):
         connection.execute("BEGIN IMMEDIATE")
         for table, rule in RULES.items():
             invalid = connection.execute(
-                f"SELECT id FROM {table} WHERE NOT ({rule})"
+                f"SELECT id FROM {table} WHERE ({rule}) IS NOT TRUE"
             ).fetchall()
             if invalid:
                 ids = [row[0] for row in invalid]
                 raise sqlite3.IntegrityError(
                     f"Cannot install constraints: invalid {table} IDs {ids}")
             for operation in ("INSERT", "UPDATE"):
+                connection.execute(
+                    f"DROP TRIGGER IF EXISTS {table}_validate_{operation}")
                 connection.execute(f"""
-                    CREATE TRIGGER IF NOT EXISTS {table}_validate_{operation}
+                    CREATE TRIGGER {table}_validate_{operation}
                     AFTER {operation} ON {table}
                     WHEN EXISTS (
                         SELECT 1 FROM {table}
-                        WHERE id = NEW.id AND NOT ({rule})
+                        WHERE id = NEW.id AND ({rule}) IS NOT TRUE
                     )
                     BEGIN
                         SELECT RAISE(ABORT, 'Invalid {table} values');
