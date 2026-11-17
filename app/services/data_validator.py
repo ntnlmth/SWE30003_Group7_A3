@@ -8,6 +8,7 @@ dict of field errors so a form can show every problem at once.
 import re
 from datetime import datetime
 
+from app.data.listing_repository import ListingRepository
 from app.services.form_validation import (check_length, check_number,
                                           first_error, require)
 
@@ -52,7 +53,7 @@ class DataValidator:
 
     def __init__(self, store):
         """Create a DataValidator that looks up listings in ``store``."""
-        self._store = store
+        self._repository = ListingRepository(store)
 
     def validate(self, listing_type, form):
         """Return a dict of field errors for a listing form.
@@ -100,12 +101,8 @@ class DataValidator:
         type has the same name and location, ignoring case and spaces.
         ``exclude_id`` leaves out the listing being edited.
         """
-        return self._store.find_one(
-            "SELECT * FROM listings WHERE listing_type = ? "
-            "AND lower(trim(name)) = lower(trim(?)) "
-            "AND lower(trim(location)) = lower(trim(?)) "
-            "AND id != ?",
-            (listing_type, name or "", location or "", exclude_id or 0))
+        return self._repository.find_duplicate(
+            listing_type, name, location, exclude_id)
 
     @staticmethod
     def _add(errors, field, message):
