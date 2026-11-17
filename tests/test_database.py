@@ -195,7 +195,7 @@ def test_constraints_preserve_existing_data(store):
 
 @pytest.mark.parametrize("table, columns, values", [
     ('bookings', 'tourist_id, listing_id, check_in, check_out, guests, '
-     'total_price, status',
+                 'total_price, status',
      "1, 1, '2027-01-02', '2027-01-01', 1, 1, 'pending'"),
     ('payments', 'booking_id, amount, status', "1, -1, 'pending'"),
     ('payments', 'booking_id, amount, status', "1, 0, 'invalid'"),

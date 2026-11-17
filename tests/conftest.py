@@ -32,7 +32,9 @@ def client(app):
 @pytest.fixture
 def sign_in(client):
     """Return a helper that signs in as one of the sample accounts."""
+
     def _sign_in(email):
         return client.post("/auth/sign-in", data={
             "email": email, "password": SAMPLE_PASSWORD})
+
     return _sign_in

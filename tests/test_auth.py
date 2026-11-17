@@ -35,7 +35,7 @@ def test_register_then_signed_in(client):
     response = client.post("/auth/register", data={
         "name": "New Tourist", "email": "new@example.com",
         "password": "Password1!", "role": "tourist"},
-        follow_redirects=True)
+                           follow_redirects=True)
     assert "Welcome, New Tourist" in response.get_data(as_text=True)
 
 
