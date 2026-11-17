@@ -31,16 +31,20 @@ class DataStore:
         """Return the single DataStore, creating it on first use.
 
         Args:
-            path: Database file to use. Passing a different path points
-                the existing instance at that file, which the tests use
-                to work on a temporary database.
+            path: Database file to use on first initialization.
+
+        Raises:
+            RuntimeError: If no initial path is supplied, or a different
+                path is supplied after initialization.
         """
         if cls._instance is None:
             if path is None:
                 raise RuntimeError("DataStore needs a database path first.")
             cls._instance = cls(path)
         elif path is not None and path != cls._instance._path:
-            cls._instance._path = path
+            raise RuntimeError(
+                "DataStore is already initialized with a different "
+                "database path.")
         return cls._instance
 
     def _connect(self):

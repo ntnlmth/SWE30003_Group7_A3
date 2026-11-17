@@ -29,10 +29,10 @@ SAMPLE_LISTINGS = [
 
 
 def _seed_users_and_listings(store):
-    """Insert the sample users and listings if the database is empty."""
-    if store.find_one("SELECT id FROM users LIMIT 1") is not None:
-        return
+    """Insert missing sample users and listings, preserving existing data."""
     for role, name, email in SAMPLE_USERS:
+        if store.find_one("SELECT id FROM users WHERE email = ?", (email,)):
+            continue
         store.execute(
             "INSERT INTO users (role, name, email, password_hash) "
             "VALUES (?, ?, ?, ?)",
@@ -40,6 +40,10 @@ def _seed_users_and_listings(store):
         )
     for (listing_type, operator_email, name, location, price, phone,
          opening, closing_time, rooms) in SAMPLE_LISTINGS:
+        if store.find_one(
+                "SELECT id FROM listings WHERE name = ? AND listing_type = ?",
+                (name, listing_type)):
+            continue
         operator = None
         if operator_email is not None:
             operator = store.find_one(

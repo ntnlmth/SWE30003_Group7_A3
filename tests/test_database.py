@@ -192,3 +192,68 @@ def test_constraints_preserve_existing_data(store):
 def test_constraints_reject_inserts(store, table, columns, values):
     with pytest.raises(sqlite3.IntegrityError):
         store.execute(f"INSERT INTO {table} ({columns}) VALUES ({values})")
+
+
+def test_singleton_requires_initial_path(isolated_store):
+    with pytest.raises(RuntimeError, match="needs a database path"):
+        DataStore.get_instance()
+
+
+def test_singleton_reuses_original_instance(store):
+    assert DataStore.get_instance() is store
+    assert DataStore.get_instance(store._path) is store
+
+
+def test_singleton_rejects_database_switch(store, tmp_path):
+    original_path = store._path
+    before = store.find_all("SELECT * FROM bookings")
+    other_path = tmp_path / "other.db"
+    with pytest.raises(RuntimeError, match="different database path"):
+        DataStore.get_instance(str(other_path))
+    assert DataStore.get_instance() is store
+    assert store._path == original_path
+    assert store.find_all("SELECT * FROM bookings") == before
+    assert not other_path.exists()
+
+
+@pytest.mark.parametrize("partial_samples", [False, True])
+def test_seed_fills_missing_users_and_listings(tmp_path, partial_samples):
+    store = DataStore(str(tmp_path / "seed.db"))
+    store.create_schema()
+    email = 'operator@example.com' if partial_samples else 'custom@example.com'
+    user_id = store.execute(
+        "INSERT INTO users (role, name, email, password_hash) "
+        "VALUES ('operator', 'Existing user', ?, 'existing hash')", (email,))
+    listing_name = 'Damai Beach Resort' if partial_samples else 'Custom hotel'
+    listing_id = store.execute(
+        "INSERT INTO listings (listing_type, operator_id, name, location, "
+        "price) VALUES ('accommodation', ?, ?, 'Custom location', 123)",
+        (user_id, listing_name))
+    user_before = store.find_one(
+        "SELECT * FROM users WHERE id = ?", (user_id,))
+    listing_before = store.find_one(
+        "SELECT * FROM listings WHERE id = ?", (listing_id,))
+
+    seed_sample_data(store)
+
+    assert store.find_one(
+        "SELECT * FROM users WHERE id = ?", (user_id,)) == user_before
+    assert store.find_one(
+        "SELECT * FROM listings WHERE id = ?", (listing_id,)) == listing_before
+    assert len(store.find_all("SELECT * FROM users")) == (
+        4 if partial_samples else 5)
+    assert len(store.find_all("SELECT * FROM listings")) == (
+        5 if partial_samples else 6)
+    assert len(store.find_all("SELECT * FROM bookings")) == 4
+    assert store.find_all("PRAGMA foreign_key_check") == []
+    operator = store.find_one(
+        "SELECT id FROM users WHERE email = 'operator@example.com'")
+    hotel = store.find_one(
+        "SELECT operator_id FROM listings "
+        "WHERE name = 'Riverside Kuching Hotel'")
+    assert hotel['operator_id'] == operator['id']
+    tables = ('users', 'listings', 'bookings', 'payments', 'itineraries',
+              'itinerary_items', 'activity_log', 'notifications')
+    before = {t: store.find_all(f"SELECT * FROM {t}") for t in tables}
+    seed_sample_data(store)
+    assert before == {t: store.find_all(f"SELECT * FROM {t}") for t in tables}

@@ -3,11 +3,18 @@
 import pytest
 
 from app import create_app
+from app.data.data_store import DataStore
 from app.data.seed import SAMPLE_PASSWORD
 
 
 @pytest.fixture
-def app(tmp_path):
+def isolated_store(monkeypatch):
+    """Isolate singleton state and restore it after each test."""
+    monkeypatch.setattr(DataStore, "_instance", None)
+
+
+@pytest.fixture
+def app(tmp_path, isolated_store):
     """Return an app that uses a fresh database for each test."""
     return create_app({
         "TESTING": True,
