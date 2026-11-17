@@ -9,6 +9,8 @@ import os
 import sqlite3
 from contextlib import closing, contextmanager
 
+from app.data.constraints import install_constraints
+
 SCHEMA_FILE = os.path.join(os.path.dirname(__file__), "schema.sql")
 
 
@@ -67,6 +69,7 @@ class DataStore:
         with closing(self._connect()) as connection:
             connection.executescript(script)
             connection.commit()
+            install_constraints(connection)
 
     def execute(self, sql, params=()):
         """Run an insert, update or delete and commit it.

@@ -137,3 +137,58 @@ def test_transaction_rolls_back_and_closes(store, sql_error):
     assert store.find_all("SELECT * FROM bookings ORDER BY id") == before
     with pytest.raises(sqlite3.ProgrammingError):
         connection.execute("SELECT 1")
+
+
+@pytest.mark.parametrize("sql", [
+    "UPDATE bookings SET status = 'invalid'",
+    "UPDATE payments SET status = 'invalid'",
+    "UPDATE payments SET amount = -1",
+    "UPDATE payments SET amount = 'invalid'",
+    "UPDATE bookings SET check_out = check_in",
+    "UPDATE bookings SET check_out = '2000-01-01'",
+])
+def test_booking_payment_constraints(store, sql):
+    with pytest.raises(sqlite3.IntegrityError):
+        store.execute(sql)
+
+
+def test_constraint_boundaries(store):
+    for status in ('pending', 'confirmed', 'cancelled'):
+        store.execute("UPDATE bookings SET status = ?", (status,))
+    for status in ('success', 'failed', 'pending'):
+        store.execute("UPDATE payments SET status = ?, amount = 0",
+                      (status,))
+
+
+def test_constraints_preserve_existing_data(store):
+    from app.data.constraints import install_constraints
+
+    with store.transaction() as connection:
+        for table in ('bookings', 'payments'):
+            for operation in ('INSERT', 'UPDATE'):
+                connection.execute(
+                    f"DROP TRIGGER {table}_validate_{operation}")
+    before = store.find_all("SELECT * FROM bookings")
+    store.create_schema()
+    store.create_schema()
+    assert store.find_all("SELECT * FROM bookings") == before
+    assert store.find_all("PRAGMA foreign_key_check") == []
+    with store.transaction() as connection:
+        connection.execute("DROP TRIGGER payments_validate_UPDATE")
+        connection.execute("UPDATE payments SET amount = -1")
+    with pytest.raises(sqlite3.IntegrityError):
+        with store._connect() as connection:
+            install_constraints(connection)
+    assert store.find_one("SELECT amount FROM payments")["amount"] == -1
+
+
+@pytest.mark.parametrize("table, columns, values", [
+    ('bookings', 'tourist_id, listing_id, check_in, check_out, guests, '
+     'total_price, status',
+     "1, 1, '2027-01-02', '2027-01-01', 1, 1, 'pending'"),
+    ('payments', 'booking_id, amount, status', "1, -1, 'pending'"),
+    ('payments', 'booking_id, amount, status', "1, 0, 'invalid'"),
+])
+def test_constraints_reject_inserts(store, table, columns, values):
+    with pytest.raises(sqlite3.IntegrityError):
+        store.execute(f"INSERT INTO {table} ({columns}) VALUES ({values})")
