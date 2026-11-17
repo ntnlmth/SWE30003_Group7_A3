@@ -39,7 +39,7 @@ def _seed_users_and_listings(store):
             (role, name, email, generate_password_hash(SAMPLE_PASSWORD)),
         )
     for (listing_type, operator_email, name, location, price, phone,
-         opening, closing, rooms) in SAMPLE_LISTINGS:
+         opening, closing_time, rooms) in SAMPLE_LISTINGS:
         operator = None
         if operator_email is not None:
             operator = store.find_one(
@@ -49,12 +49,12 @@ def _seed_users_and_listings(store):
             "location, price, contact_phone, opening_time, closing_time, "
             "room_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (listing_type, operator["id"] if operator else None, name,
-             location, price, phone, opening, closing, rooms),
+             location, price, phone, opening, closing_time, rooms),
         )
 
 
 def seed_sample_data(store):
-    """Add linked demo scenarios once, retaining existing accounts and records."""
+    """Add linked demo scenarios once, retaining existing records."""
     _seed_users_and_listings(store)
     tourist = store.find_one(
         "SELECT id FROM users WHERE email = ? AND role = 'tourist'",
@@ -109,12 +109,17 @@ def seed_sample_data(store):
                         "VALUES (?, ?, ?)",
                         (tourist["id"], action, f"booking:{booking_id}"))
                 message = {
-                    "success": "Simulated payment successful; booking confirmed.",
+                    "success": (
+                        "Simulated payment successful; booking confirmed."),
                     "failed": "Simulated payment failed; please retry.",
-                }.get(payment_status, "Booking cancelled before payment."
-                if status == "cancelled" else "Booking awaiting payment.")
+                }.get(
+                    payment_status,
+                    "Booking cancelled before payment."
+                    if status == "cancelled" else "Booking awaiting payment.",
+                )
                 connection.execute(
-                    "INSERT INTO notifications (user_id, message) VALUES (?, ?)",
+                    "INSERT INTO notifications (user_id, message) "
+                    "VALUES (?, ?)",
                     (tourist["id"], f"[Demo booking {booking_id}] {message}"))
 
             itinerary_id = connection.execute(
@@ -132,11 +137,17 @@ def seed_sample_data(store):
                     "day, start_time, end_time) VALUES (?, ?, ?, ?, ?)",
                     (itinerary_id, listing_id, day, start, end))
             connection.execute(
-                "INSERT INTO activity_log (user_id, action, item) VALUES (?, ?, ?)",
-                (tourist["id"], "itinerary_created", f"itinerary:{itinerary_id}"))
+                "INSERT INTO activity_log (user_id, action, item) "
+                "VALUES (?, ?, ?)",
+                (tourist["id"], "itinerary_created",
+                 f"itinerary:{itinerary_id}"))
             connection.execute(
-                "INSERT INTO notifications (user_id, message) VALUES (?, ?)",
-                (tourist["id"], "[Demo] Kuching three-day itinerary saved."))
+                "INSERT INTO notifications (user_id, message) "
+                "VALUES (?, ?)",
+                (tourist["id"],
+                 "[Demo] Kuching three-day itinerary saved."))
             connection.execute(
-                "INSERT INTO activity_log (user_id, action, item) VALUES (?, ?, ?)",
-                (tourist["id"], marker, "Linked demonstration dataset installed"))
+                "INSERT INTO activity_log (user_id, action, item) "
+                "VALUES (?, ?, ?)",
+                (tourist["id"], marker,
+                 "Linked demonstration dataset installed"))
