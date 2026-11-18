@@ -2,7 +2,21 @@
 
 from datetime import date, timedelta
 
+import pytest
+
+from app import create_app
 from app.data.data_store import DataStore
+
+
+@pytest.fixture
+def app(tmp_path, isolated_store):
+    """Use users and listings without linked demonstration records."""
+    return create_app({
+        "TESTING": True,
+        "DATABASE": str(tmp_path / "listing-routes.db"),
+        "SECRET_KEY": "test",
+        "SEED_DEMO_DATA": False,
+    })
 
 
 def lodge_form(**changes):

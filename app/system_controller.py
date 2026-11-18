@@ -11,7 +11,7 @@ import os
 from flask import Flask
 
 from app.data.data_store import DataStore
-from app.data.seed import seed_sample_data
+from app.data.seed import seed_sample_data, seed_users_and_listings
 from app.routes import auth, bookings, itineraries, listings, main, payments
 from app.services.authenticator import Authenticator
 
@@ -31,6 +31,7 @@ def create_app(config=None):
         SECRET_KEY=os.environ.get("STIS_SECRET_KEY", "dev-only-change-me"),
         DATABASE=os.path.join(app.instance_path, "stis.db"),
         SEED_SAMPLE_DATA=True,
+        SEED_DEMO_DATA=True,
     )
     if config:
         app.config.update(config)
@@ -40,7 +41,10 @@ def create_app(config=None):
     store = DataStore.get_instance(app.config["DATABASE"])
     store.create_schema()
     if app.config["SEED_SAMPLE_DATA"]:
-        seed_sample_data(store)
+        if app.config["SEED_DEMO_DATA"]:
+            seed_sample_data(store)
+        else:
+            seed_users_and_listings(store)
 
     # Bootstrap step 2: shared services.
     app.extensions["authenticator"] = Authenticator(store)

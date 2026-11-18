@@ -7,8 +7,20 @@ import pytest
 from app.controllers.listing_manager import (InvalidListing, ListingManager,
                                              ListingNotFound, NotAllowed,
                                              PossibleDuplicate)
+from app import create_app
 from app.data.data_store import DataStore
 from app.services.authenticator import Authenticator
+
+
+@pytest.fixture
+def app(tmp_path, isolated_store):
+    """Use users and listings without linked demonstration records."""
+    return create_app({
+        "TESTING": True,
+        "DATABASE": str(tmp_path / "listing-manager.db"),
+        "SECRET_KEY": "test",
+        "SEED_DEMO_DATA": False,
+    })
 
 
 @pytest.fixture
@@ -295,7 +307,7 @@ def test_every_change_is_recorded_with_who_and_what(
     """The audit trail names the user, the action and the listing."""
     manager.create_listing(people["omar"], "accommodation", lodge_form())
     rows = store.find_all(
-        "SELECT user_id, action, item FROM activity_log")
+        "SELECT user_id, ACTION, item FROM activity_log")
     assert rows == [{"user_id": people["omar"].user_id,
                      "action": "listing.created",
                      "item": rows[0]["item"]}]
@@ -313,6 +325,7 @@ def test_a_failed_change_leaves_no_audit_entry(manager, people, store):
 def test_supplied_activity_log_is_used_instead_of_the_table(
         store, people):
     """An ActivityLog object, when given, receives the entries."""
+
     class FakeLog:
         """Collect calls so the test can inspect them."""
 

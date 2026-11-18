@@ -57,6 +57,12 @@ def _seed_users_and_listings(connection):
         )
 
 
+def seed_users_and_listings(store):
+    """Add missing sample users and listings, preserving existing data."""
+    with store.transaction() as connection:
+        _seed_users_and_listings(connection)
+
+
 def seed_sample_data(store):
     """Add linked demo scenarios once, retaining existing records."""
     with store.transaction() as connection:
