@@ -7,7 +7,9 @@ objects through it instead of opening the database itself.
 
 import os
 import sqlite3
-from contextlib import closing
+from contextlib import closing, contextmanager
+
+from app.data.constraints import install_constraints
 
 SCHEMA_FILE = os.path.join(os.path.dirname(__file__), "schema.sql")
 
@@ -29,16 +31,20 @@ class DataStore:
         """Return the single DataStore, creating it on first use.
 
         Args:
-            path: Database file to use. Passing a different path points
-                the existing instance at that file, which the tests use
-                to work on a temporary database.
+            path: Database file to use on first initialization.
+
+        Raises:
+            RuntimeError: If no initial path is supplied, or a different
+                path is supplied after initialization.
         """
         if cls._instance is None:
             if path is None:
                 raise RuntimeError("DataStore needs a database path first.")
             cls._instance = cls(path)
         elif path is not None and path != cls._instance._path:
-            cls._instance._path = path
+            raise RuntimeError(
+                "DataStore is already initialized with a different "
+                "database path.")
         return cls._instance
 
     def _connect(self):
@@ -48,6 +54,18 @@ class DataStore:
         connection.execute("PRAGMA foreign_keys = ON")
         return connection
 
+    @contextmanager
+    def transaction(self):
+        """Yield a connection; commit on success and roll back on error.
+
+        Run all SQL in the block through the yielded connection.
+        The connection is closed when the block exits.
+        """
+        with closing(self._connect()) as connection:
+            with connection:
+                connection.execute("BEGIN")
+                yield connection
+
     def create_schema(self):
         """Create any tables that do not exist yet."""
         with open(SCHEMA_FILE, encoding="utf-8") as schema:
@@ -55,6 +73,7 @@ class DataStore:
         with closing(self._connect()) as connection:
             connection.executescript(script)
             connection.commit()
+            install_constraints(connection)
 
     def execute(self, sql, params=()):
         """Run an insert, update or delete and commit it.
