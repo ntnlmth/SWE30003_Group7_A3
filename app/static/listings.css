@@ -1,0 +1,171 @@
+/* Styles for the Manage listings area only. */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  align-items: end;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: .8rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.toolbar label {
+  display: grid;
+  gap: .2rem;
+  font-weight: 600;
+  font-size: .9rem;
+}
+
+.toolbar input,
+.toolbar select {
+  padding: .45rem .55rem;
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.add-row {
+  margin: 0 0 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
+}
+
+.btn {
+  display: inline-block;
+  padding: .45rem .8rem;
+  border-radius: 6px;
+  border: 1px solid var(--brand);
+  background: var(--brand);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn.secondary {
+  background: #fff;
+  color: var(--brand);
+}
+
+.btn.danger {
+  background: var(--error);
+  border-color: var(--error);
+}
+
+.btn.small {
+  padding: .25rem .55rem;
+  font-size: .9rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: .55rem .7rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.table th {
+  background: #eef3f2;
+  font-size: .9rem;
+}
+
+.table td.actions {
+  white-space: nowrap;
+}
+
+.table td.actions form {
+  display: inline;
+}
+
+.badge {
+  display: inline-block;
+  padding: .1rem .5rem;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 600;
+}
+
+.badge.active {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.badge.off {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.empty {
+  background: #fff;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 1.2rem;
+  color: var(--muted);
+}
+
+.warn {
+  background: #fff7e0;
+  border: 1px solid #f0d68a;
+  border-radius: 8px;
+  padding: .8rem 1rem;
+  margin-bottom: 1rem;
+  max-width: 560px;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  max-width: 640px;
+  margin-bottom: 1rem;
+}
+
+.panel ul {
+  margin: .4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.form.wide {
+  max-width: 560px;
+}
+
+.form textarea {
+  padding: .55rem .6rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+  min-height: 5rem;
+}
+
+.form .buttons {
+  display: flex;
+  gap: .6rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.form .buttons button {
+  margin-top: 0 !important;
+}
+
+.cancel {
+  color: var(--brand);
+  margin-left: .4rem;
+}
