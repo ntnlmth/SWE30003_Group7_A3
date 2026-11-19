@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}My bookings{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='bookings.css') }}">
+<h1>My bookings</h1>
+<p><a class="btn secondary small" href="{{ url_for('bookings.index') }}">&larr; Search accommodation</a></p>
+
+{% if views %}
+<table class="table">
+  <thead>
+    <tr><th>Accommodation</th><th>Check-in</th><th>Check-out</th><th>Guests</th><th>Total (RM)</th><th>Status</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+  {% for view in views %}
+    <tr>
+      <td>{{ view.listing_name }}<br><span class="hint">{{ view.listing_location }}</span></td>
+      <td>{{ view.booking.check_in }}</td>
+      <td>{{ view.booking.check_out }}</td>
+      <td>{{ view.booking.guests }}</td>
+      <td>{{ '%.2f'|format(view.booking.total_price) }}</td>
+      <td>
+        <span class="badge {{ 'active' if view.booking.status == 'confirmed' else ('off' if view.booking.status == 'cancelled' else '') }}">
+          {{ view.booking.status_label }}
+        </span>
+      </td>
+      <td class="actions">
+        {% if view.may_cancel %}
+          <a class="btn danger small" href="{{ url_for('bookings.cancel', booking_id=view.booking.booking_id) }}">Cancel</a>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">You have no bookings yet. Search for accommodation to make one.</p>
+{% endif %}
+{% endblock %}

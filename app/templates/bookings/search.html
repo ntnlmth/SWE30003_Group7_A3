@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Search and book accommodation{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='bookings.css') }}">
+<h1>Search and book accommodation</h1>
+
+<form method="get" class="toolbar">
+  <label>Location
+    <input name="location" value="{{ filters.location }}" placeholder="Kuching, Miri, ...">
+  </label>
+  <label>Check-in
+    <input type="date" name="check_in" value="{{ filters.check_in }}">
+  </label>
+  <label>Check-out
+    <input type="date" name="check_out" value="{{ filters.check_out }}">
+  </label>
+  <button type="submit" class="btn small">Search</button>
+  <a class="btn secondary small" href="{{ url_for('bookings.index') }}">Clear</a>
+  <a class="btn secondary small" href="{{ url_for('bookings.mine') }}">My bookings</a>
+</form>
+
+{% if not searched %}
+<p class="empty">Search by location, and add your dates to see how many rooms are free. Leave everything blank to see every active accommodation.</p>
+{% elif results %}
+<table class="table">
+  <thead>
+    <tr><th>Name</th><th>Location</th><th>Price per night (RM)</th><th>Rooms</th><th></th></tr>
+  </thead>
+  <tbody>
+  {% for result in results %}
+    <tr>
+      <td>{{ result.listing.name }}</td>
+      <td>{{ result.listing.location }}</td>
+      <td>{{ '%.2f'|format(result.listing.price) }}</td>
+      <td>
+        {% if result.available_rooms is not none %}
+          <span class="badge {{ 'active' if result.has_availability else 'off' }}">
+            {{ result.available_rooms }} of {{ result.listing.room_count }} free
+          </span>
+        {% else %}
+          {{ result.listing.room_count }} rooms
+        {% endif %}
+      </td>
+      <td>
+        {% if result.has_availability %}
+          <a class="btn small" href="{{ url_for('bookings.book', listing_id=result.listing.listing_id, check_in=filters.check_in, check_out=filters.check_out) }}">Book</a>
+        {% else %}
+          <span class="hint">No rooms for these dates</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No accommodation matches. Try a different location.</p>
+{% endif %}
+{% endblock %}

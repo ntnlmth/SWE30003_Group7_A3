@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Book {{ accommodation.name }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='bookings.css') }}">
+<h1>Book: {{ accommodation.name }}</h1>
+<p class="hint">{{ accommodation.location }} &middot; RM {{ '%.2f'|format(accommodation.price) }} per night &middot; {{ accommodation.room_count }} rooms in total</p>
+
+{% if errors %}
+<div class="flash error" role="alert">Some details need fixing. Check the fields marked below; what you typed has been kept.</div>
+{% endif %}
+
+{% if not_available is not none %}
+<div class="warn" role="alert">
+  <strong>No room is free for those dates.</strong>
+  {{ not_available }} of {{ accommodation.room_count }} rooms are free for this accommodation over that date range.
+  Try different dates, or search for somewhere else.
+</div>
+{% endif %}
+
+<form method="post" class="form wide" novalidate>
+  <label for="check_in">Check-in date</label>
+  <input id="check_in" type="date" name="check_in" value="{{ form.check_in }}">
+  {% if errors.check_in %}<p class="field-error">{{ errors.check_in }}</p>{% endif %}
+
+  <label for="check_out">Check-out date</label>
+  <input id="check_out" type="date" name="check_out" value="{{ form.check_out }}">
+  {% if errors.check_out %}<p class="field-error">{{ errors.check_out }}</p>{% endif %}
+
+  <label for="guests">Number of guests</label>
+  <input id="guests" name="guests" value="{{ form.guests }}" inputmode="numeric">
+  {% if errors.guests %}<p class="field-error">{{ errors.guests }}</p>{% endif %}
+
+  <div class="buttons">
+    <button type="submit" class="btn">Book now (pay later)</button>
+    <a class="cancel" href="{{ url_for('bookings.index') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

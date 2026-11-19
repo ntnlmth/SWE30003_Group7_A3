@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Cancel booking{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='bookings.css') }}">
+<h1>Cancel booking #{{ booking.booking_id }}?</h1>
+
+<div class="warn" role="alert">
+  This booking ({{ booking.check_in }} to {{ booking.check_out }}, {{ booking.guests }} guest(s)) will be marked
+  <strong>cancelled</strong>. It is kept on your bookings list for your records, but no payment is expected for it.
+</div>
+
+<form method="post">
+  <button type="submit" class="btn danger">Cancel this booking</button>
+  <a class="cancel" href="{{ url_for('bookings.mine') }}">Keep booking</a>
+</form>
+{% endblock %}
