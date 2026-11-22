@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Pay for booking #{{ payable.booking.booking_id }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='payments.css') }}">
+<h1>Pay for booking #{{ payable.booking.booking_id }}</h1>
+
+<div class="summary">
+  <p><strong>{{ payable.listing_name }}</strong>, {{ payable.listing_location }}</p>
+  <p>{{ payable.booking.check_in }} to {{ payable.booking.check_out }}
+     &middot; {{ payable.booking.nights }} night(s) &middot; {{ payable.booking.guests }} guest(s)</p>
+  <p class="amount">Amount due: RM {{ '%.2f'|format(payable.booking.total_price) }}</p>
+</div>
+
+<div class="warn">
+  <strong>Simulated payment.</strong> No real money is charged. Use a test card:
+  <code>4242 4242 4242 4242</code> is approved,
+  <code>4000 0000 0000 0002</code> is declined, and
+  <code>4000 0000 0000 9995</code> has insufficient funds.
+  Any future expiry date and any 3-digit security code will do.
+</div>
+
+{% if errors %}
+<div class="flash error" role="alert">Some card details need fixing. Check the fields marked below.</div>
+{% endif %}
+
+{% if declined %}
+<div class="flash error" role="alert">
+  <strong>Payment declined.</strong> {{ declined }} Your booking is still pending; you can try again or use another card.
+</div>
+{% endif %}
+
+<form method="post" class="form wide" novalidate autocomplete="off">
+  <label for="holder_name">Name on card</label>
+  <input id="holder_name" name="holder_name" value="{{ form.holder_name }}">
+  {% if errors.holder_name %}<p class="field-error">{{ errors.holder_name }}</p>{% endif %}
+
+  <label for="card_number">Card number</label>
+  <input id="card_number" name="card_number" inputmode="numeric" placeholder="4242 4242 4242 4242">
+  {% if errors.card_number %}<p class="field-error">{{ errors.card_number }}</p>{% endif %}
+
+  <div class="row">
+    <div>
+      <label for="expiry">Expiry (MM/YY)</label>
+      <input id="expiry" name="expiry" value="{{ form.expiry or '' }}" placeholder="08/28">
+      {% if errors.expiry %}<p class="field-error">{{ errors.expiry }}</p>{% endif %}
+    </div>
+    <div>
+      <label for="cvv">Security code</label>
+      <input id="cvv" name="cvv" inputmode="numeric" placeholder="123">
+      {% if errors.cvv %}<p class="field-error">{{ errors.cvv }}</p>{% endif %}
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button type="submit" class="btn">Pay RM {{ '%.2f'|format(payable.booking.total_price) }}</button>
+    <a class="cancel" href="{{ url_for('payments.index') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}
