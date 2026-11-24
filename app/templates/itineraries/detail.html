@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ itinerary.title }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='listings.css') }}">
+<h1>{{ itinerary.title }}</h1>
+<p>{{ itinerary.start_date }} to {{ itinerary.end_date }}</p>
+<p>
+  <a class="btn" href="{{ url_for('itineraries.add_item', itinerary_id=itinerary.itinerary_id) }}">Add activity</a>
+  <a class="btn secondary" href="{{ url_for('itineraries.edit', itinerary_id=itinerary.itinerary_id) }}">Edit itinerary</a>
+  <button class="btn secondary" type="button" onclick="window.print()">Print / save PDF</button>
+</p>
+{% if itinerary.items %}
+<table class="table">
+  <thead><tr><th>Day</th><th>Time</th><th>Listing</th><th>Location</th><th>Actions</th></tr></thead>
+  <tbody>
+  {% for item in itinerary.items %}
+    <tr>
+      <td>{{ item.day }}</td>
+      <td>{{ item.start_time }}-{{ item.end_time }}</td>
+      <td>{{ item.listing.name if item.listing else 'Unavailable listing' }}</td>
+      <td>{{ item.listing.location if item.listing else '' }}</td>
+      <td class="actions">
+        <a class="btn secondary small" href="{{ url_for('itineraries.edit_item', itinerary_id=itinerary.itinerary_id, item_id=item.item_id) }}">Move / edit</a>
+        <form class="inline" method="post" action="{{ url_for('itineraries.delete_item', itinerary_id=itinerary.itinerary_id, item_id=item.item_id) }}">
+          <button class="btn danger small" type="submit">Remove</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No activities planned yet.</p>
+{% endif %}
+<form class="inline" method="post" action="{{ url_for('itineraries.delete', itinerary_id=itinerary.itinerary_id) }}" onsubmit="return confirm('Delete this itinerary?');">
+  <button class="btn danger" type="submit">Delete itinerary</button>
+</form>
+{% endblock %}
