@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Receipt {{ view.payment.reference }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='payments.css') }}">
+<h1>Payment receipt</h1>
+
+<div class="summary receipt">
+  <dl>
+    <dt>Reference</dt><dd>{{ view.payment.reference }}</dd>
+    <dt>Paid on</dt><dd>{{ view.payment.created_at }}</dd>
+    <dt>For</dt><dd>{{ view.listing_name }} (booking #{{ view.payment.booking_id }})</dd>
+    <dt>Amount</dt><dd>RM {{ '%.2f'|format(view.payment.amount) }}</dd>
+    <dt>Status</dt><dd><span class="badge active">{{ view.payment.status_label }}</span></dd>
+  </dl>
+</div>
+
+<p>
+  <a class="btn" href="{{ url_for('bookings.mine') }}">My bookings</a>
+  <a class="btn secondary" href="{{ url_for('payments.index') }}">Payments</a>
+</p>
+{% endblock %}

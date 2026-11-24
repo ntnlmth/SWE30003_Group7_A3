@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Pay for a booking{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='payments.css') }}">
+<h1>Pay for a booking</h1>
+<p><a class="btn secondary small" href="{{ url_for('bookings.mine') }}">&larr; My bookings</a></p>
+
+<h2>Waiting for payment</h2>
+{% if unpaid %}
+<table class="table">
+  <thead>
+    <tr><th>Booking</th><th>Accommodation</th><th>Dates</th><th>Guests</th><th>Amount (RM)</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+  {% for item in unpaid %}
+    <tr>
+      <td>#{{ item.booking.booking_id }}</td>
+      <td>{{ item.listing_name }}<br><span class="hint">{{ item.listing_location }}</span></td>
+      <td>{{ item.booking.check_in }} to {{ item.booking.check_out }}</td>
+      <td>{{ item.booking.guests }}</td>
+      <td>{{ '%.2f'|format(item.booking.total_price) }}</td>
+      <td class="actions">
+        <a class="btn small" href="{{ url_for('payments.pay', booking_id=item.booking.booking_id) }}">Pay now</a>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">Nothing to pay. Bookings you make appear here until they are paid.</p>
+{% endif %}
+
+<h2>Payment history</h2>
+{% if payments %}
+<table class="table">
+  <thead>
+    <tr><th>Date</th><th>For</th><th>Amount (RM)</th><th>Reference</th><th>Status</th><th></th></tr>
+  </thead>
+  <tbody>
+  {% for view in payments %}
+    <tr>
+      <td>{{ view.payment.created_at }}</td>
+      <td>{{ view.listing_name }} (booking #{{ view.payment.booking_id }})</td>
+      <td>{{ '%.2f'|format(view.payment.amount) }}</td>
+      <td>{{ view.payment.reference or '' }}</td>
+      <td><span class="badge {{ 'active' if view.payment.succeeded else 'off' }}">{{ view.payment.status_label }}</span></td>
+      <td class="actions">
+        {% if view.payment.succeeded %}
+          <a class="btn secondary small" href="{{ url_for('payments.receipt', payment_id=view.payment.payment_id) }}">Receipt</a>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No payments yet.</p>
+{% endif %}
+
+<h2>Notifications</h2>
+{% if notifications %}
+<ul class="notifications">
+  {% for note in notifications %}
+    <li><span class="hint">{{ note.created_at }}</span> {{ note.message }}</li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">No notifications.</p>
+{% endif %}
+{% endblock %}
