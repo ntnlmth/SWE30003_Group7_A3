@@ -148,7 +148,7 @@ application. There is no direct foreign key between bookings and itineraries.
 | Sign-in, app setup, DataStore       | Nathan  | `auth.py`, `main.py`    |
 | Search and book accommodation       | Badrul  | `bookings.py`           |
 | Pay for a booking                   | Zaferah | `payments.py`           |
-| Plan an itinerary                   | Rukman  | `itineraries.py`        |
+| Plan an itinerary                   | Ivan    | `itineraries.py`        |
 | Manage listings                     | Anisa   | `listings.py`           |
 | Database, run instructions, checks  | Ivan    | `app/data`, `tests`     |
 
