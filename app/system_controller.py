@@ -7,6 +7,7 @@ services, then register one route module per area.
 """
 
 import os
+from datetime import timedelta
 
 from flask import Flask
 
@@ -32,9 +33,14 @@ def create_app(config=None):
         DATABASE=os.path.join(app.instance_path, "stis.db"),
         SEED_SAMPLE_DATA=True,
         SEED_DEMO_DATA=True,
+        SESSION_TIMEOUT_MINUTES=30,
     )
     if config:
         app.config.update(config)
+    # The browser drops the cookie when the idle limit passes as well;
+    # Authenticator enforces the same limit on the server (S4).
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(
+        minutes=app.config["SESSION_TIMEOUT_MINUTES"])
     os.makedirs(app.instance_path, exist_ok=True)
 
     # Bootstrap step 1: the single DataStore and its schema.

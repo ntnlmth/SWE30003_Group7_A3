@@ -83,3 +83,36 @@ def test_operators_may_change_only_their_own_listings():
     assert not Authenticator.may_change_listing(operator, 3)
     assert Authenticator.may_change_listing(admin, 3)
     assert not Authenticator.may_change_listing(None, 2)
+
+
+def test_idle_session_is_ended_after_the_timeout(client, sign_in):
+    """A session idle for more than 30 minutes is signed out (S4)."""
+    sign_in("tourist@example.com")
+    with client.session_transaction() as saved:
+        saved["last_seen"] -= 31 * 60
+    response = client.get("/bookings/", follow_redirects=True)
+    text = response.get_data(as_text=True)
+    assert "signed out after 30 minutes of inactivity" in text
+    assert "Sign in" in text
+    with client.session_transaction() as saved:
+        assert "user_id" not in saved
+
+
+def test_activity_keeps_the_session_open(client, sign_in):
+    """Each request restarts the idle timer, so active users stay in."""
+    sign_in("tourist@example.com")
+    with client.session_transaction() as saved:
+        saved["last_seen"] -= 29 * 60
+    client.get("/")
+    with client.session_transaction() as saved:
+        saved["last_seen"] -= 29 * 60
+    response = client.get("/bookings/")
+    assert response.status_code == 200
+
+
+def test_sign_out_ends_the_session(client, sign_in):
+    """After signing out, area screens need sign-in again."""
+    sign_in("tourist@example.com")
+    client.post("/auth/sign-out")
+    response = client.get("/bookings/")
+    assert "/auth/sign-in" in response.headers["Location"]

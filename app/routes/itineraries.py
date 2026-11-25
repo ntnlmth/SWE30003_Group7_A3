@@ -1,4 +1,4 @@
-"""Area: Plan an itinerary (owner: Rukman)."""
+"""Area: Plan an itinerary (owner: Ivan, taking over from Rukman)."""
 
 from flask import (Blueprint, current_app, flash, g, redirect,
                    render_template, request, url_for)
@@ -10,6 +10,7 @@ from app.controllers.itinerary_manager import (InvalidItinerary,
                                                NotAllowed,
                                                ScheduleConflict)
 from app.data.data_store import DataStore
+from app.services.activity_log import ActivityLog
 from app.services.authenticator import sign_in_required
 
 blueprint = Blueprint("itineraries", __name__, url_prefix="/itineraries")
@@ -18,8 +19,9 @@ blueprint = Blueprint("itineraries", __name__, url_prefix="/itineraries")
 @blueprint.record_once
 def create_itinerary_manager(state):
     """Bootstrap step: create the itinerary manager with the app."""
+    store = DataStore.get_instance()
     state.app.extensions["itinerary_manager"] = ItineraryManager(
-        DataStore.get_instance())
+        store, activity_log=ActivityLog(store))
 
 
 def get_itinerary_manager():

@@ -1,4 +1,9 @@
-"""Business workflows for creating and changing itineraries."""
+"""Business workflows for creating and changing itineraries.
+
+Every change a tourist makes (creating, changing or deleting an
+itinerary, and adding, moving or removing an item) is recorded through
+ActivityLog (Area 2), the same audit trail the other areas use.
+"""
 
 from datetime import date, datetime
 
@@ -6,6 +11,7 @@ from app.data.itinerary_repository import ItineraryRepository
 from app.data.listing_repository import ListingRepository
 from app.models.itinerary import Itinerary, ItineraryItem
 from app.models.listing import Listing
+from app.services.activity_log import ActivityLog
 from app.services.scheduler import Scheduler
 
 
@@ -47,12 +53,25 @@ class ItineraryManager:
     """Coordinate itinerary and itinerary-item business rules."""
 
     def __init__(self, store, repository=None, listing_repository=None,
-                 scheduler=None, today=date.today):
-        """Create a manager with repository and scheduling collaborators."""
+                 scheduler=None, today=date.today, activity_log=None):
+        """Create a manager with repository and scheduling collaborators.
+
+        Args:
+            store: The DataStore.
+            repository: An ItineraryRepository; one is created if not given.
+            listing_repository: A ListingRepository; one is created if
+                not given.
+            scheduler: A Scheduler; one is created if not given.
+            today: Function returning today's date, replaced in tests.
+            activity_log: An ActivityLog, or any object with
+                ``record(user_id, action, item)``; one is created if not
+                given.
+        """
         self._repository = repository or ItineraryRepository(store)
         self._listings = listing_repository or ListingRepository(store)
         self._scheduler = scheduler or Scheduler()
         self._today = today
+        self._activity_log = activity_log or ActivityLog(store)
 
     def list_itineraries(self, user):
         """Return all itineraries owned by a tourist."""
@@ -83,7 +102,9 @@ class ItineraryManager:
         itinerary_id = self._repository.create(
             user.user_id, title, start_date, end_date)
         row = self._repository.find_itinerary(itinerary_id)
-        return Itinerary.from_row(row)
+        itinerary = Itinerary.from_row(row)
+        self._record(user, "itinerary.created", itinerary)
+        return itinerary
 
     def update_itinerary(self, user, itinerary_id, form):
         """Validate and update an owned itinerary."""
@@ -102,12 +123,15 @@ class ItineraryManager:
         self._repository.update(
             itinerary_id, title, start_date, end_date)
         row = self._repository.find_itinerary(itinerary_id)
-        return Itinerary.from_row(row, itinerary.items)
+        updated = Itinerary.from_row(row, itinerary.items)
+        self._record(user, "itinerary.updated", updated)
+        return updated
 
     def delete_itinerary(self, user, itinerary_id):
         """Delete an owned itinerary and its items."""
         itinerary = self.get_itinerary(user, itinerary_id)
         self._repository.delete(itinerary.itinerary_id)
+        self._record(user, "itinerary.deleted", itinerary)
 
     def find_listing(self, listing_id):
         """Return an active Listing object for itinerary scheduling."""
@@ -124,7 +148,9 @@ class ItineraryManager:
     def add_item(self, user, itinerary_id, form):
         """Validate and add an item to an owned itinerary."""
         itinerary = self.get_itinerary(user, itinerary_id)
-        return self._save_item(itinerary, None, form)
+        item = self._save_item(itinerary, None, form)
+        self._record(user, "itinerary.item_added", itinerary)
+        return item
 
     def move_item(self, user, itinerary_id, item_id, form):
         """Move or edit an owned itinerary item."""
@@ -132,7 +158,9 @@ class ItineraryManager:
         row = self._repository.find_item(item_id, itinerary_id)
         if row is None:
             raise ItineraryNotFound("That itinerary item no longer exists.")
-        return self._save_item(itinerary, row["id"], form)
+        item = self._save_item(itinerary, row["id"], form)
+        self._record(user, "itinerary.item_moved", itinerary)
+        return item
 
     def get_item(self, user, itinerary_id, item_id):
         """Return an owned itinerary item row."""
@@ -149,6 +177,12 @@ class ItineraryManager:
         if row is None:
             raise ItineraryNotFound("That itinerary item no longer exists.")
         self._repository.delete_item(item_id)
+        self._record(user, "itinerary.item_removed", itinerary)
+
+    def _record(self, user, action, itinerary):
+        """Record who changed which itinerary, and when."""
+        item = f"{itinerary.title} (itinerary #{itinerary.itinerary_id})"
+        self._activity_log.record(user.user_id, action, item)
 
     @staticmethod
     def _require_tourist(user):

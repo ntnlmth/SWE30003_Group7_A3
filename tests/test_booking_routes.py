@@ -4,6 +4,7 @@ import pytest
 
 from app import create_app
 from app.data.data_store import DataStore
+from app.services.activity_log import ActivityLog
 
 
 @pytest.fixture
@@ -173,3 +174,18 @@ def test_tourist_cannot_cancel_another_tourists_booking(client, sign_in):
     response = client.get(f"/bookings/{booking_id}/cancel",
                           follow_redirects=True)
     assert "You may cancel only your own bookings." in page(response)
+
+
+# ------------------------------------------------------------ audit trail
+
+def test_booking_is_recorded_by_the_activity_log(client, sign_in):
+    """Booking a room leaves an entry the ActivityLog can read back."""
+    sign_in("tourist@example.com")
+    listing_id = listing_id_named("Riverside Kuching Hotel")
+    client.post(f"/bookings/{listing_id}/book", data=booking_form())
+    store = DataStore.get_instance()
+    tourist = store.find_one(
+        "SELECT id FROM users WHERE email = 'tourist@example.com'")
+    entries = ActivityLog(store).entries_for(tourist["id"])
+    assert entries[0]["action"] == "booking.created"
+    assert entries[0]["item"].startswith("Riverside Kuching Hotel")

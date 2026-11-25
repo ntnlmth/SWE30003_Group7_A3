@@ -15,6 +15,7 @@ from app.controllers.booking_manager import (BookingManager, BookingNotFound,
                                              NotAvailable)
 from app.controllers.listing_catalogue import ListingCatalogue
 from app.data.data_store import DataStore
+from app.services.activity_log import ActivityLog
 from app.services.authenticator import sign_in_required
 
 blueprint = Blueprint("bookings", __name__, url_prefix="/bookings")
@@ -27,7 +28,7 @@ def create_booking_services(state):
     catalogue = ListingCatalogue(store)
     state.app.extensions["listing_catalogue"] = catalogue
     state.app.extensions["booking_manager"] = BookingManager(
-        store, catalogue=catalogue)
+        store, catalogue=catalogue, activity_log=ActivityLog(store))
 
 
 def get_catalogue():
