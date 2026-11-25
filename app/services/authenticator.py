@@ -1,9 +1,11 @@
 """Authenticator: registers users, checks sign-in and permissions.
 
 Implements CRC card 5.25. Passwords are stored only as salted hashes
-(detailed-design change, report Section 2.3).
+(detailed-design change, report Section 2.3). A session ends at sign-out
+or after 30 minutes without a request (Requirement S4).
 """
 
+import time
 from functools import wraps
 
 from flask import current_app, flash, g, redirect, request, session, url_for
@@ -97,10 +99,47 @@ def get_authenticator():
     return current_app.extensions["authenticator"]
 
 
+def start_session(user):
+    """Sign ``user`` in for this browser, replacing any earlier session."""
+    session.clear()
+    session.permanent = True
+    session["user_id"] = user.user_id
+    session["last_seen"] = time.time()
+
+
+def end_session():
+    """Sign the current user out."""
+    session.clear()
+
+
+def session_expired(now=None):
+    """Say whether the signed-in session has been idle for too long."""
+    last_seen = session.get("last_seen")
+    if last_seen is None:
+        return True
+    limit = current_app.config["SESSION_TIMEOUT_MINUTES"] * 60
+    return (now or time.time()) - last_seen > limit
+
+
 def load_current_user():
-    """Put the signed-in user, if any, on ``g.user`` for this request."""
+    """Put the signed-in user, if any, on ``g.user`` for this request.
+
+    A session idle for longer than ``SESSION_TIMEOUT_MINUTES`` is ended
+    first, so the request is handled as signed out (Requirement S4).
+    Every other request by a signed-in user restarts the idle timer.
+    """
+    g.user = None
     user_id = session.get("user_id")
-    g.user = get_authenticator().find_by_id(user_id) if user_id else None
+    if not user_id:
+        return
+    if session_expired():
+        end_session()
+        minutes = current_app.config["SESSION_TIMEOUT_MINUTES"]
+        flash(f"You were signed out after {minutes} minutes of "
+              "inactivity. Please sign in again.", "error")
+        return
+    session["last_seen"] = time.time()
+    g.user = get_authenticator().find_by_id(user_id)
 
 
 def sign_in_required(*roles):

@@ -1,9 +1,9 @@
 """Register, sign in and sign out screens."""
 
-from flask import (Blueprint, flash, redirect, render_template, request,
-                   session, url_for)
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from app.services.authenticator import get_authenticator
+from app.services.authenticator import (end_session, get_authenticator,
+                                        start_session)
 
 blueprint = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -33,8 +33,7 @@ def register():
         if not errors:
             user = authenticator.register(
                 form["name"], form["email"], password, form["role"])
-            session.clear()
-            session["user_id"] = user.user_id
+            start_session(user)
             flash(f"Welcome, {user.name}. Your account has been created.",
                   "success")
             return redirect(url_for("main.home"))
@@ -56,8 +55,7 @@ def sign_in():
             if user is None:
                 error = "Email or password is incorrect."
             else:
-                session.clear()
-                session["user_id"] = user.user_id
+                start_session(user)
                 flash(f"Signed in as {user.name}.", "success")
                 return redirect(_safe_next(request.args.get("next")))
     return render_template("auth/sign_in.html", email=email, error=error)
@@ -66,6 +64,6 @@ def sign_in():
 @blueprint.route("/sign-out", methods=["POST"])
 def sign_out():
     """End the session and return to the home screen."""
-    session.clear()
+    end_session()
     flash("You have signed out.", "success")
     return redirect(url_for("main.home"))
