@@ -14,6 +14,7 @@ from app.controllers.listing_manager import (InvalidListing, ListingManager,
                                              PossibleDuplicate)
 from app.data.data_store import DataStore
 from app.models.listing import Listing
+from app.services.activity_log import ActivityLog
 from app.services.authenticator import sign_in_required
 from app.services.data_validator import MANAGEABLE_TYPES
 
@@ -23,8 +24,9 @@ blueprint = Blueprint("listings", __name__, url_prefix="/listings")
 @blueprint.record_once
 def create_listing_manager(state):
     """Bootstrap step: create the ListingManager with the application."""
+    store = DataStore.get_instance()
     state.app.extensions["listing_manager"] = ListingManager(
-        DataStore.get_instance())
+        store, activity_log=ActivityLog(store))
 
 
 def get_listing_manager():

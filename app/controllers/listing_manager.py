@@ -14,9 +14,9 @@ Detailed-design changes from Assignment 2 (for the report):
   referred to it, because the database would refuse the delete. If any
   record refers to it, it is deactivated. The upcoming ones are listed as
   the affected items.
-* The audit record goes to ``activity_log`` through ``activity_log.record``
-  when an ActivityLog object is supplied, and straight to the table
-  otherwise.
+* The audit record is written by ActivityLog (Area 2) through
+  ``activity_log.record``. The application supplies the shared one
+  (``routes/listings.py``); a manager created without one makes its own.
 * All SQL lives in ListingRepository (``app/data/listing_repository.py``),
   so this class holds only the rules: who may do what, in what order.
 """
@@ -26,6 +26,7 @@ from datetime import date
 
 from app.data.listing_repository import ListingRepository
 from app.models.listing import Listing
+from app.services.activity_log import ActivityLog
 from app.services.authenticator import Authenticator
 from app.services.data_validator import (MANAGEABLE_TYPES, TYPES_WITH_HOURS,
                                          DataValidator, parse_time)
@@ -97,14 +98,15 @@ class ListingManager:
         Args:
             store: The DataStore.
             validator: A DataValidator; one is created if not given.
-            activity_log: Optional object with ``record(user_id, action,
-                item)``. Without it, entries are written to the table.
+            activity_log: An ActivityLog, or any object with
+                ``record(user_id, action, item)``; one is created if not
+                given.
             today: Function returning today's date, replaced in tests.
             repository: A ListingRepository; one is created if not given.
         """
         self._repository = repository or ListingRepository(store)
         self._validator = validator or DataValidator(store)
-        self._activity_log = activity_log
+        self._activity_log = activity_log or ActivityLog(store)
         self._today = today
 
     # ------------------------------------------------------------------
@@ -275,7 +277,4 @@ class ListingManager:
     def _record(self, user, action, listing):
         """Record who did what to which listing, and when."""
         item = f"{listing.name} (#{listing.listing_id})"
-        if self._activity_log is not None:
-            self._activity_log.record(user.user_id, action, item)
-        else:
-            self._repository.add_audit_entry(user.user_id, action, item)
+        self._activity_log.record(user.user_id, action, item)
