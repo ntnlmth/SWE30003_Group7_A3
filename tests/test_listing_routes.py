@@ -6,6 +6,7 @@ import pytest
 
 from app import create_app
 from app.data.data_store import DataStore
+from app.services.activity_log import ActivityLog
 
 
 @pytest.fixture
@@ -253,3 +254,17 @@ def test_removing_a_missing_listing_returns_to_the_list(client, sign_in):
     sign_in("admin@example.com")
     response = client.get("/listings/9999/remove", follow_redirects=True)
     assert "That listing no longer exists." in page(response)
+
+
+# ---------------------------------------------------------- audit trail
+
+def test_listing_changes_are_recorded_by_the_activity_log(client, sign_in):
+    """Adding a listing leaves an entry the ActivityLog can read back."""
+    sign_in("operator@example.com")
+    client.post("/listings/new/accommodation", data=lodge_form())
+    store = DataStore.get_instance()
+    operator = store.find_one(
+        "SELECT id FROM users WHERE email = 'operator@example.com'")
+    entries = ActivityLog(store).entries_for(operator["id"])
+    assert entries[0]["action"] == "listing.created"
+    assert entries[0]["item"].startswith("Bako Lodge")

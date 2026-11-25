@@ -144,12 +144,3 @@ class ListingRepository:
         return self._store.find_one(
             "SELECT id FROM itinerary_items WHERE listing_id = ? LIMIT 1",
             (listing_id,)) is not None
-
-    # ------------------------------------------------------------------
-    # Audit trail
-
-    def add_audit_entry(self, user_id, action, item):
-        """Write one line to the ``activity_log`` table."""
-        self._store.execute(
-            "INSERT INTO activity_log (user_id, action, item) "
-            "VALUES (?, ?, ?)", (user_id, action, item))
