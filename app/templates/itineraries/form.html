@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit itinerary' if mode == 'edit' else 'Create itinerary' }}{% endblock %}
+{% block content %}
+<h1>{{ 'Edit itinerary' if mode == 'edit' else 'Create itinerary' }}</h1>
+<form class="form" method="post">
+  <label for="title">Title</label>
+  <input id="title" name="title" value="{{ form.title }}" maxlength="100">
+  {% if errors.title %}<p class="field-error">{{ errors.title }}</p>{% endif %}
+  <label for="start_date">Start date</label>
+  <input id="start_date" name="start_date" type="date" value="{{ form.start_date }}">
+  {% if errors.start_date %}<p class="field-error">{{ errors.start_date }}</p>{% endif %}
+  <label for="end_date">End date</label>
+  <input id="end_date" name="end_date" type="date" value="{{ form.end_date }}">
+  {% if errors.end_date %}<p class="field-error">{{ errors.end_date }}</p>{% endif %}
+  <button type="submit">{{ 'Save changes' if mode == 'edit' else 'Create' }}</button>
+</form>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit activity' if mode == 'edit' else 'Add activity' }}{% endblock %}
+{% block content %}
+<h1>{{ 'Edit activity' if mode == 'edit' else 'Add activity' }}</h1>
+<p>{{ itinerary.title }}: {{ itinerary.start_date }} to {{ itinerary.end_date }}</p>
+{% if clashes %}
+<div class="flash error" role="alert">
+  <strong>The activity was not saved:</strong>
+  <ul>{% for clash in clashes %}<li>{{ clash.message }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+<form class="form" method="post">
+  <label for="listing_id">Listing</label>
+  <select id="listing_id" name="listing_id">
+    <option value="">Choose a listing</option>
+    {% for listing in listings %}
+    <option value="{{ listing.listing_id }}" {{ 'selected' if form.listing_id == (listing.listing_id|string) else '' }}>{{ listing.name }} - {{ listing.location }}</option>
+    {% endfor %}
+  </select>
+  {% if errors.listing_id %}<p class="field-error">{{ errors.listing_id }}</p>{% endif %}
+  <label for="day">Day</label>
+  <input id="day" name="day" type="date" min="{{ itinerary.start_date }}" max="{{ itinerary.end_date }}" value="{{ form.day }}">
+  {% if errors.day %}<p class="field-error">{{ errors.day }}</p>{% endif %}
+  <label for="start_time">Start time</label>
+  <input id="start_time" name="start_time" type="time" value="{{ form.start_time }}">
+  {% if errors.start_time %}<p class="field-error">{{ errors.start_time }}</p>{% endif %}
+  <label for="end_time">End time</label>
+  <input id="end_time" name="end_time" type="time" value="{{ form.end_time }}">
+  {% if errors.end_time %}<p class="field-error">{{ errors.end_time }}</p>{% endif %}
+  <button type="submit">{{ 'Save changes' if mode == 'edit' else 'Add activity' }}</button>
+</form>
+{% endblock %}

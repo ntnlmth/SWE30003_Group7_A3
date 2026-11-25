@@ -184,6 +184,13 @@ main {
     font: inherit;
 }
 
+.form select {
+    padding: .55rem .6rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font: inherit;
+}
+
 .form button[type=submit] {
     margin-top: 1rem;
     padding: .6rem;
