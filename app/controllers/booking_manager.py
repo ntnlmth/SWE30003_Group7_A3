@@ -36,6 +36,7 @@ from datetime import date, datetime
 
 from app.data.booking_repository import BookingRepository
 from app.models.booking import Booking
+from app.services.activity_log import ActivityLog
 from app.services.form_validation import first_error, require
 
 DATE_FORMAT = "%Y-%m-%d"
@@ -119,8 +120,9 @@ class BookingManager:
         Args:
             store: The DataStore.
             catalogue: A ListingCatalogue; one is created if not given.
-            activity_log: Optional object with ``record(user_id, action,
-                item)``. Without it, entries are written to the table.
+            activity_log: An ActivityLog, or any object with
+                ``record(user_id, action, item)``; one is created if not
+                given.
             today: Function returning today's date, replaced in tests.
             repository: A BookingRepository; one is created if not given.
         """
@@ -130,7 +132,7 @@ class BookingManager:
 
         self._repository = repository or BookingRepository(store)
         self._catalogue = catalogue or ListingCatalogue(store)
-        self._activity_log = activity_log
+        self._activity_log = activity_log or ActivityLog(store)
         self._today = today
 
     # ------------------------------------------------------------------
@@ -270,7 +272,4 @@ class BookingManager:
     def _record(self, user, action, booking, item_name):
         """Record who booked or cancelled what, and when."""
         item = f"{item_name} (booking #{booking.booking_id})"
-        if self._activity_log is not None:
-            self._activity_log.record(user.user_id, action, item)
-        else:
-            self._repository.add_audit_entry(user.user_id, action, item)
+        self._activity_log.record(user.user_id, action, item)

@@ -68,17 +68,3 @@ class BookingRepository:
         self._store.execute(
             "UPDATE bookings SET status = ? WHERE id = ?",
             (status, booking_id))
-
-    # ------------------------------------------------------------------
-    # Audit trail
-
-    def add_audit_entry(self, user_id, action, item):
-        """Write one line to the ``activity_log`` table.
-
-        Mirrors ListingRepository.add_audit_entry (Manage listings area):
-        duplicated rather than shared, so this area's repository does not
-        depend on another area's.
-        """
-        self._store.execute(
-            "INSERT INTO activity_log (user_id, action, item) "
-            "VALUES (?, ?, ?)", (user_id, action, item))
