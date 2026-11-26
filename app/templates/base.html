@@ -11,10 +11,15 @@
 		<a class="brand" href="{{ url_for('main.home') }}">Sarawak Tourism Information System</a>
 		<nav>
 			{% if g.user %}
-				<span class="who">{{ g.user.name }} ({{ g.user.display_role }})</span>
 				{% if g.user.role == 'tourist' %}
-					<a class="my-bookings" href="{{ url_for('bookings.mine') }}">My bookings</a>
+					<a class="app-nav" href="{{ url_for('bookings.index') }}">Search</a>
+					<a class="app-nav" href="{{ url_for('payments.index') }}">Pay</a>
+					<a class="app-nav" href="{{ url_for('itineraries.index') }}">Plan</a>
+					<a class="app-nav" href="{{ url_for('bookings.mine') }}">My bookings</a>
+				{% elif g.user.role in ['operator', 'admin'] %}
+					<a class="app-nav" href="{{ url_for('listings.index') }}">Listings</a>
 				{% endif %}
+				<span class="who">{{ g.user.name }} ({{ g.user.display_role }})</span>
 				<form method="post" action="{{ url_for('auth.sign_out') }}" class="inline">
 					<button type="submit" class="link sign-out">Sign out</button>
 				</form>
