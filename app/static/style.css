@@ -30,8 +30,9 @@ body {
     justify-content: flex-start;
     align-items: center;
     flex-wrap: wrap;
-    gap: .8rem;
-    padding: .8rem 1.8rem;
+    column-gap: .8rem;
+    row-gap: 0;
+    padding: 0 1.8rem;
     background: var(--brand);
     color: #fff;
 }
@@ -48,18 +49,22 @@ body {
 
 .primary-nav {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    min-width: 0;
+    min-height: 3.6rem;
     gap: .15rem;
     margin-left: .4rem;
+    overflow-x: auto;
+    align-self: stretch;
 }
 
 .primary-nav .app-nav {
     display: inline-flex;
-    min-height: 3.2rem;
     align-items: center;
     justify-content: center;
-    padding: .55rem .8rem;
+    align-self: stretch;
+    padding: 0 .8rem;
     border-bottom: 3px solid transparent;
     border-radius: 4px 4px 0 0;
     font-size: 1rem;
@@ -494,7 +499,8 @@ legend {
 
 @media (max-width: 600px) {
     .topbar {
-        padding: .8rem 1rem;
+        column-gap: .4rem;
+        padding: 0 1rem;
     }
 
     .brand {
@@ -504,12 +510,12 @@ legend {
     .primary-nav {
         order: 3;
         flex-basis: 100%;
+        min-height: 3.2rem;
         margin-left: -.4rem;
     }
 
     .primary-nav .app-nav {
-        min-height: 2.8rem;
-        padding: .45rem .65rem;
+        padding: 0 .65rem;
         font-size: .95rem;
     }
 
