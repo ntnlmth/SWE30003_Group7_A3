@@ -381,6 +381,9 @@ h1 {
     border: 1px solid var(--line);
     border-radius: 6px;
     font: inherit;
+}
+
+.form textarea {
     min-height: 5rem;
 }
 
