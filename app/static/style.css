@@ -27,7 +27,7 @@ body {
 
 .topbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     flex-wrap: wrap;
     gap: .8rem;
@@ -46,14 +46,46 @@ body {
     font-size: 1.2rem;
 }
 
-.topbar nav {
+.primary-nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .15rem;
+    margin-left: .4rem;
+}
+
+.primary-nav .app-nav {
+    display: inline-flex;
+    min-height: 3.2rem;
+    align-items: center;
+    justify-content: center;
+    padding: .55rem .8rem;
+    border-bottom: 3px solid transparent;
+    border-radius: 4px 4px 0 0;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.primary-nav .app-nav:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+.primary-nav .app-nav.active {
+    border-bottom-color: #fff;
+    background: rgba(255, 255, 255, .16);
+}
+
+.account-nav {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: .8rem;
+    margin-left: auto;
 }
 
-.topbar nav a, .topbar nav .link {
+.account-nav a,
+.account-nav .link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -64,20 +96,16 @@ body {
     font-weight: 600;
 }
 
-.topbar nav .sign-in {
+.account-nav .sign-in {
     background: #fff;
     color: var(--brand);
 }
 
-.topbar nav .register {
+.account-nav .register {
     border-color: #fff;
 }
 
-.topbar nav .app-nav {
-    border-color: #fff;
-}
-
-.topbar nav .sign-out {
+.account-nav .sign-out {
     background: var(--error);
     color: #fff;
 }
@@ -471,6 +499,22 @@ legend {
 
     .brand {
         font-size: 1.05rem;
+    }
+
+    .primary-nav {
+        order: 3;
+        flex-basis: 100%;
+        margin-left: -.4rem;
+    }
+
+    .primary-nav .app-nav {
+        min-height: 2.8rem;
+        padding: .45rem .65rem;
+        font-size: .95rem;
+    }
+
+    .account-nav {
+        gap: .4rem;
     }
 
     main {
