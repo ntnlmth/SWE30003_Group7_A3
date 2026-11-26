@@ -2,6 +2,7 @@
 {% block title %}{{ 'Edit activity' if mode == 'edit' else 'Add activity' }}{% endblock %}
 {% block content %}
 <h1>{{ 'Edit activity' if mode == 'edit' else 'Add activity' }}</h1>
+<p class="page-back"><a href="{{ url_for('itineraries.detail', itinerary_id=itinerary.itinerary_id) }}">&larr; Back to itinerary</a></p>
 <p>{{ itinerary.title }}: {{ itinerary.start_date }} to {{ itinerary.end_date }}</p>
 {% if clashes %}
 <div class="flash error" role="alert">
@@ -27,6 +28,6 @@
   <label for="end_time">End time</label>
   <input id="end_time" name="end_time" type="time" value="{{ form.end_time }}">
   {% if errors.end_time %}<p class="field-error">{{ errors.end_time }}</p>{% endif %}
-  <button type="submit">{{ 'Save changes' if mode == 'edit' else 'Add activity' }}</button>
+  <button class="btn" type="submit">{{ 'Save changes' if mode == 'edit' else 'Add activity' }}</button>
 </form>
 {% endblock %}

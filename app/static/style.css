@@ -73,6 +73,10 @@ body {
     border-color: #fff;
 }
 
+.topbar nav .my-bookings {
+    border-color: #fff;
+}
+
 .topbar nav .sign-out {
     background: var(--error);
     color: #fff;
@@ -98,6 +102,189 @@ main {
     max-width: 960px;
     margin: 2rem auto;
     padding: 0 1rem;
+    width: 100%;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+.page-back {
+    margin: -.5rem 0 1rem;
+}
+
+.page-back a,
+.cancel {
+    color: var(--brand);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.page-back a:hover,
+.cancel:hover {
+    text-decoration: underline;
+}
+
+.page-actions,
+.add-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .6rem;
+    margin: 0 0 1rem;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: .6rem;
+    width: 100%;
+    min-height: 5.2rem;
+    margin-bottom: 1rem;
+    padding: .8rem 1rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.toolbar label {
+    display: grid;
+    flex: 1 1 11rem;
+    gap: .2rem;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.toolbar input,
+.toolbar select {
+    width: 100%;
+    min-height: 2.4rem;
+    padding: .45rem .55rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font: inherit;
+}
+
+.btn {
+    display: inline-flex;
+    min-height: 2.4rem;
+    align-items: center;
+    justify-content: center;
+    padding: .45rem .8rem;
+    border: 1px solid var(--brand);
+    border-radius: 6px;
+    background: var(--brand);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn.secondary {
+    background: #fff;
+    color: var(--brand);
+}
+
+.btn.danger {
+    border-color: var(--error);
+    background: var(--error);
+}
+
+.btn.small {
+    min-height: 2rem;
+    padding: .25rem .55rem;
+    font-size: .9rem;
+}
+
+.table-wrap {
+    width: 100%;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    min-width: 640px;
+    border: 1px solid var(--line);
+    border-collapse: collapse;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.table th,
+.table td {
+    padding: .55rem .7rem;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.table th {
+    background: #eef3f2;
+    font-size: .9rem;
+}
+
+.table td.actions {
+    white-space: normal;
+}
+
+.table td.actions form {
+    display: inline-block;
+}
+
+.badge {
+    display: inline-block;
+    padding: .1rem .5rem;
+    border-radius: 999px;
+    background: #eef3f2;
+    color: var(--ink);
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.badge.active {
+    background: var(--ok-bg);
+    color: var(--ok);
+}
+
+.badge.off {
+    background: var(--error-bg);
+    color: var(--error);
+}
+
+.empty {
+    padding: 1.2rem;
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--muted);
+}
+
+.warn {
+    max-width: 640px;
+    margin-bottom: 1rem;
+    padding: .8rem 1rem;
+    border: 1px solid #f0d68a;
+    border-radius: 8px;
+    background: #fff7e0;
+}
+
+.panel {
+    max-width: 640px;
+    margin-bottom: 1rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.panel ul {
+    margin: .4rem 0 0;
+    padding-left: 1.2rem;
 }
 
 .auth-main {
@@ -172,6 +359,10 @@ main {
     gap: .35rem;
 }
 
+.form.wide {
+    max-width: 560px;
+}
+
 .form label {
     font-weight: 600;
     margin-top: .6rem;
@@ -184,23 +375,42 @@ main {
     font: inherit;
 }
 
-.form select {
+.form select,
+.form textarea {
     padding: .55rem .6rem;
     border: 1px solid var(--line);
     border-radius: 6px;
     font: inherit;
+    min-height: 5rem;
 }
 
-.form button[type=submit] {
+.form button[type=submit]:not(.btn) {
     margin-top: 1rem;
-    padding: .6rem;
-    border: 0;
+    min-height: 2.4rem;
+    padding: .45rem .8rem;
+    border: 1px solid var(--brand);
     border-radius: 6px;
     background: var(--brand);
     color: #fff;
     font: inherit;
     font-weight: 600;
     cursor: pointer;
+}
+
+.form .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .6rem;
+    margin-top: 1rem;
+}
+
+.form .buttons button {
+    margin-top: 0;
+}
+
+.cancel {
+    margin-left: .4rem;
 }
 
 fieldset {
@@ -249,4 +459,31 @@ legend {
     border: 1px dashed var(--line);
     border-radius: 8px;
     padding: 1.5rem;
+}
+
+@media (max-width: 600px) {
+    .topbar {
+        padding: .8rem 1rem;
+    }
+
+    .brand {
+        font-size: 1.05rem;
+    }
+
+    main {
+        margin: 1.25rem auto;
+    }
+
+    .toolbar {
+        min-height: 0;
+    }
+
+    .toolbar label {
+        flex-basis: 100%;
+    }
+
+    .form .row {
+        grid-template-columns: 1fr;
+        gap: .35rem;
+    }
 }

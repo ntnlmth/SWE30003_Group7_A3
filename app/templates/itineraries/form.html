@@ -2,6 +2,13 @@
 {% block title %}{{ 'Edit itinerary' if mode == 'edit' else 'Create itinerary' }}{% endblock %}
 {% block content %}
 <h1>{{ 'Edit itinerary' if mode == 'edit' else 'Create itinerary' }}</h1>
+<p class="page-back">
+  {% if mode == 'edit' %}
+    <a href="{{ url_for('itineraries.detail', itinerary_id=itinerary.itinerary_id) }}">&larr; Back to itinerary</a>
+  {% else %}
+    <a href="{{ url_for('itineraries.index') }}">&larr; Back to My itineraries</a>
+  {% endif %}
+</p>
 <form class="form" method="post">
   <label for="title">Title</label>
   <input id="title" name="title" value="{{ form.title }}" maxlength="100">
@@ -12,6 +19,6 @@
   <label for="end_date">End date</label>
   <input id="end_date" name="end_date" type="date" value="{{ form.end_date }}">
   {% if errors.end_date %}<p class="field-error">{{ errors.end_date }}</p>{% endif %}
-  <button type="submit">{{ 'Save changes' if mode == 'edit' else 'Create' }}</button>
+  <button class="btn" type="submit">{{ 'Save changes' if mode == 'edit' else 'Create' }}</button>
 </form>
 {% endblock %}

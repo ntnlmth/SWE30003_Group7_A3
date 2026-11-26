@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title %}My bookings{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='bookings.css') }}">
 <h1>My bookings</h1>
-<p><a class="btn secondary small" href="{{ url_for('bookings.index') }}">&larr; Search accommodation</a></p>
+<p class="page-back"><a href="{{ url_for('bookings.index') }}">&larr; Back to Search accommodation</a></p>
 
 {% if views %}
+<div class="table-wrap">
 <table class="table">
   <thead>
     <tr><th>Accommodation</th><th>Check-in</th><th>Check-out</th><th>Guests</th><th>Total (RM)</th><th>Status</th><th>Actions</th></tr>
@@ -32,6 +32,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
 <p class="empty">You have no bookings yet. Search for accommodation to make one.</p>
 {% endif %}

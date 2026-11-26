@@ -3,6 +3,7 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='payments.css') }}">
 <h1>Pay for booking #{{ payable.booking.booking_id }}</h1>
+<p class="page-back"><a href="{{ url_for('payments.index') }}">&larr; Back to Payments</a></p>
 
 <div class="summary">
   <p><strong>{{ payable.listing_name }}</strong>, {{ payable.listing_location }}</p>

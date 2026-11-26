@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Book {{ accommodation.name }}{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='bookings.css') }}">
 <h1>Book: {{ accommodation.name }}</h1>
+<p class="page-back"><a href="{{ url_for('bookings.index') }}">&larr; Back to Accommodation Search</a></p>
 <p class="hint">{{ accommodation.location }} &middot; RM {{ '%.2f'|format(accommodation.price) }} per night &middot; {{ accommodation.room_count }} rooms in total</p>
 
 {% if errors %}

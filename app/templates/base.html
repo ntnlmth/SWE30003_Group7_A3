@@ -12,6 +12,9 @@
 		<nav>
 			{% if g.user %}
 				<span class="who">{{ g.user.name }} ({{ g.user.display_role }})</span>
+				{% if g.user.role == 'tourist' %}
+					<a class="my-bookings" href="{{ url_for('bookings.mine') }}">My bookings</a>
+				{% endif %}
 				<form method="post" action="{{ url_for('auth.sign_out') }}" class="inline">
 					<button type="submit" class="link sign-out">Sign out</button>
 				</form>

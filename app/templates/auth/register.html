@@ -4,6 +4,7 @@
 {% block content %}
 	<section class="auth-content">
 		<h1>Create an account</h1>
+		<p class="page-back"><a href="{{ url_for('auth.sign_in') }}">&larr; Back to Sign in</a></p>
 		<form method="post" class="form" novalidate>
 			<label for="name">Full name</label>
 			<input id="name" name="name" value="{{ form.name }}" maxlength="80">

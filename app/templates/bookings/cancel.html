@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Cancel booking{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='bookings.css') }}">
 <h1>Cancel booking #{{ booking.booking_id }}?</h1>
+<p class="page-back"><a href="{{ url_for('bookings.mine') }}">&larr; Back to My bookings</a></p>
 
 <div class="warn" role="alert">
   This booking ({{ booking.check_in }} to {{ booking.check_out }}, {{ booking.guests }} guest(s)) will be marked
