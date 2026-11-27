@@ -9,7 +9,32 @@
 	<body>
 	<header class="topbar">
 		<a class="brand" href="{{ url_for('main.home') }}">Sarawak Tourism Information System</a>
-		<nav>
+		<nav class="primary-nav" aria-label="Main navigation">
+			<a class="app-nav{{ ' active' if request.endpoint == 'main.home' else '' }}"
+				href="{{ url_for('main.home') }}"
+				{% if request.endpoint == 'main.home' %}aria-current="page"{% endif %}>Home</a>
+			{% if g.user %}
+				{% if g.user.role == 'tourist' %}
+					<a class="app-nav{{ ' active' if request.endpoint in ['bookings.index', 'bookings.book'] else '' }}"
+						href="{{ url_for('bookings.index') }}"
+						{% if request.endpoint in ['bookings.index', 'bookings.book'] %}aria-current="page"{% endif %}>Search</a>
+					<a class="app-nav{{ ' active' if request.endpoint in ['payments.index', 'payments.pay', 'payments.receipt'] else '' }}"
+						href="{{ url_for('payments.index') }}"
+						{% if request.endpoint in ['payments.index', 'payments.pay', 'payments.receipt'] %}aria-current="page"{% endif %}>Pay</a>
+					<a class="app-nav{{ ' active' if request.endpoint in ['itineraries.index', 'itineraries.new', 'itineraries.detail', 'itineraries.edit', 'itineraries.delete', 'itineraries.add_item', 'itineraries.edit_item', 'itineraries.delete_item'] else '' }}"
+						href="{{ url_for('itineraries.index') }}"
+						{% if request.endpoint in ['itineraries.index', 'itineraries.new', 'itineraries.detail', 'itineraries.edit', 'itineraries.delete', 'itineraries.add_item', 'itineraries.edit_item', 'itineraries.delete_item'] %}aria-current="page"{% endif %}>Plan</a>
+					<a class="app-nav{{ ' active' if request.endpoint in ['bookings.mine', 'bookings.cancel'] else '' }}"
+						href="{{ url_for('bookings.mine') }}"
+						{% if request.endpoint in ['bookings.mine', 'bookings.cancel'] %}aria-current="page"{% endif %}>My bookings</a>
+				{% elif g.user.role in ['operator', 'admin'] %}
+					<a class="app-nav{{ ' active' if request.endpoint in ['listings.index', 'listings.new', 'listings.edit', 'listings.remove', 'listings.reactivate'] else '' }}"
+						href="{{ url_for('listings.index') }}"
+						{% if request.endpoint in ['listings.index', 'listings.new', 'listings.edit', 'listings.remove', 'listings.reactivate'] %}aria-current="page"{% endif %}>Listings</a>
+				{% endif %}
+			{% endif %}
+		</nav>
+		<div class="account-nav">
 			{% if g.user %}
 				<span class="who">{{ g.user.name }} ({{ g.user.display_role }})</span>
 				<form method="post" action="{{ url_for('auth.sign_out') }}" class="inline">
@@ -19,7 +44,7 @@
 				<a class="sign-in" href="{{ url_for('auth.sign_in') }}">Sign in</a>
 				<a class="register" href="{{ url_for('auth.register') }}">Register</a>
 			{% endif %}
-		</nav>
+		</div>
 	</header>
 	<main class="{% block main_class %}{% endblock %}">
 		{% with messages = get_flashed_messages(with_categories=true) %}

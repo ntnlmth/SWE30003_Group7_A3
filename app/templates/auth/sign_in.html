@@ -4,6 +4,7 @@
 {% block content %}
 	<section class="auth-content">
 		<h1>Sign in</h1>
+		<p class="page-back"><a href="{{ url_for('main.home') }}">&larr; Back to Home</a></p>
 		<form method="post" class="form" novalidate>
 			{% if error %}
 				<div class="flash error" role="alert">{{ error }}</div>{% endif %}

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Search and book accommodation{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='bookings.css') }}">
 <h1>Search and book accommodation</h1>
+<p class="page-back"><a href="{{ url_for('main.home') }}">&larr; Back to Home</a></p>
 
 <form method="get" class="toolbar">
   <label>Location
@@ -16,12 +16,12 @@
   </label>
   <button type="submit" class="btn small">Search</button>
   <a class="btn secondary small" href="{{ url_for('bookings.index') }}">Clear</a>
-  <a class="btn secondary small" href="{{ url_for('bookings.mine') }}">My bookings</a>
 </form>
 
 {% if not searched %}
 <p class="empty">Search by location, and add your dates to see how many rooms are free. Leave everything blank to see every active accommodation.</p>
 {% elif results %}
+<div class="table-wrap">
 <table class="table">
   <thead>
     <tr><th>Name</th><th>Location</th><th>Price per night (RM)</th><th>Rooms</th><th></th></tr>
@@ -52,6 +52,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
 <p class="empty">No accommodation matches. Try a different location.</p>
 {% endif %}

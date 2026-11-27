@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Manage listings{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='listings.css') }}">
 <h1>Manage listings</h1>
+<p class="page-back"><a href="{{ url_for('main.home') }}">&larr; Back to Home</a></p>
 
 <div class="add-row">
   <strong>Add a listing:</strong>
@@ -35,6 +35,7 @@
 </form>
 
 {% if listings %}
+<div class="table-wrap">
 <table class="table">
   <thead>
     <tr><th>Name</th><th>Type</th><th>Location</th><th>Price (RM)</th><th>Status</th><th>Actions</th></tr>
@@ -62,6 +63,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
 <p class="empty">No listings match. Use the buttons above to add one, or clear the filters.</p>
 {% endif %}

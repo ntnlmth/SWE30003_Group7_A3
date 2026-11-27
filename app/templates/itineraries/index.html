@@ -2,7 +2,10 @@
 {% block title %}My itineraries{% endblock %}
 {% block content %}
 <h1>My itineraries</h1>
-<p><a class="btn" href="{{ url_for('itineraries.new') }}">Create itinerary</a></p>
+<p class="page-back"><a href="{{ url_for('main.home') }}">&larr; Back to Home</a></p>
+<div class="page-actions">
+  <a class="btn" href="{{ url_for('itineraries.new') }}">Create itinerary</a>
+</div>
 {% if itineraries %}
 <div class="cards">
 {% for itinerary in itineraries %}
